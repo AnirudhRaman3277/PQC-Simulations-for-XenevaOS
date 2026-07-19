@@ -83,6 +83,19 @@ Although the relative slowdown factor remains, an absolute overhead of roughly $
 \label{fig:exp3}
 \end{figure}
 
+\subsection{Software Supply Chain (Package Verification)}
+Package management and system updates in XenevaOS require verifying cryptographic signatures for hundreds or thousands of software packages simultaneously. We simulated batch verifications of 1MB packages to benchmark throughput scaling.
+
+\textbf{Comprehensive Data Analysis:} 
+The data confirms that RSA-2048's exceptionally fast verification speed allows for very high throughput, verifying 1000 packages in roughly 664~ms. Conversely, ML-DSA-65 scales linearly with its heavier verification overhead, taking approximately 2709~ms for the same 1000-package batch. While this introduces a $\sim 4\times$ slowdown, a total delay of 2.7 seconds to cryptographically verify a massive OS update is completely acceptable for background package managers and does not block critical paths.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.75\textwidth]{plots/exp4_package_verify.png}
+\caption{Package verification throughput across variable batch sizes. While ML-DSA is slower than RSA, its absolute time cost remains perfectly acceptable for background system updates.}
+\label{fig:exp4}
+\end{figure}
+
 \subsection{Process Isolation and Secure IPC Tunnels}
 Within the XenevaOS micro-kernel inspired architecture, Secure Inter-Process Communication (IPC) is ubiquitous. Daemons communicate via postbox mechanisms that require robust symmetric encryption bootstrapped by a secure key exchange to prevent privilege escalation. We benchmarked a full roundtrip simulation involving a standard 4KB IPC payload.
 
