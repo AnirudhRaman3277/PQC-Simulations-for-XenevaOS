@@ -4,16 +4,16 @@
 ========================================
 
 System Information
-  Compiler     : GNU g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0
+  Compiler     : Clang Clang 16.1.x
   Opt. Flags   :  -march=native -fomit-frame-pointer 
-  OpenSSL      : OpenSSL 3.5.5 27 Jan 2026
-  CPU          : AuthenticAMD AMD Ryzen 7 5800H with Radeon Graphics
+  OpenSSL      : OpenSSL 3.5.7 9 Jun 2026
+  CPU          : AuthenticAMD AMD Ryzen 7 8845HS w/ Radeon 780M Graphics
   CPU Arch     : x86_64
   Cores        : 8 Physical / 16 Logical
-  OS & Kernel  : Linux 6.18.33.2-microsoft-standard-WSL2
-  RAM          : 7.4Gi
-  Time         : 2026-07-19 09:22:02 UTC
-  Duration     : 1.71 seconds
+  OS & Kernel  : Linux 7.1.3-201.fc44.x86_64
+  RAM          : 30Gi
+  Time         : 2026-07-19 16:02:46 IST
+  Duration     : 1.27 seconds
 
 ----------------------------------------
  Results
@@ -21,27 +21,27 @@ System Information
 
   [Classical (ECDH+AES)] IPC Roundtrip
     Iterations     : 5000
-    Average        : 177.2730 us
-    Median         : 153.0760 us
-    Minimum        : 146.8090 us
-    Maximum        : 3325.7420 us
-    Std Dev        : 78.7111 us
-    95% CI         : ±2.1818 us
-    Ops/sec        : 5641.02
+    Average        : 127.9240 us
+    Median         : 126.9790 us
+    Minimum        : 126.2080 us
+    Maximum        : 498.5410 us
+    Std Dev        : 5.9643 us
+    95% CI         : ±0.1653 us
+    Ops/sec        : 7817.14
     Rel. Slowdown  : 1.0000x
     Overhead       : 0.0000 %
 
   [PQ (ML-KEM+AES)] IPC Roundtrip
     Iterations     : 5000
-    Average        : 154.0346 us
-    Median         : 137.3110 us
-    Minimum        : 136.0480 us
-    Maximum        : 4331.2170 us
-    Std Dev        : 98.2517 us
-    95% CI         : ±2.7234 us
-    Ops/sec        : 6492.05
-    Rel. Slowdown  : 0.8689x
-    Overhead       : -13.1088 %
+    Average        : 118.7280 us
+    Median         : 117.6125 us
+    Minimum        : 116.5300 us
+    Maximum        : 844.6240 us
+    Std Dev        : 18.7841 us
+    95% CI         : ±0.5207 us
+    Ops/sec        : 8422.62
+    Rel. Slowdown  : 0.9281x
+    Overhead       : -7.1887 %
 
 ========================================
  End of Log

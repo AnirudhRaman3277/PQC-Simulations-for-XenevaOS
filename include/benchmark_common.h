@@ -173,7 +173,13 @@ inline SystemInfo collect_system_info() {
     SystemInfo info;
 
     info.compiler = COMPILER_ID;
-    info.compiler_version = exec_command("g++ --version | head -1");
+#if defined(__clang__)
+    info.compiler_version = "Clang " + std::string(__clang_version__);
+#elif defined(__GNUC__)
+    info.compiler_version = "GCC " + std::to_string(__GNUC__) + "." + std::to_string(__GNUC_MINOR__) + "." + std::to_string(__GNUC_PATCHLEVEL__);
+#else
+    info.compiler_version = "Unknown Version";
+#endif
     info.optimization_flags = OPT_FLAGS;
     
     info.openssl_version = OpenSSL_version(OPENSSL_VERSION);

@@ -4,16 +4,16 @@
 ========================================
 
 System Information
-  Compiler     : GNU g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0
+  Compiler     : Clang Clang 16.1.x
   Opt. Flags   :  -march=native -fomit-frame-pointer 
-  OpenSSL      : OpenSSL 3.5.5 27 Jan 2026
-  CPU          : AuthenticAMD AMD Ryzen 7 5800H with Radeon Graphics
+  OpenSSL      : OpenSSL 3.5.7 9 Jun 2026
+  CPU          : AuthenticAMD AMD Ryzen 7 8845HS w/ Radeon 780M Graphics
   CPU Arch     : x86_64
   Cores        : 8 Physical / 16 Logical
-  OS & Kernel  : Linux 6.18.33.2-microsoft-standard-WSL2
-  RAM          : 7.4Gi
-  Time         : 2026-07-19 09:20:57 UTC
-  Duration     : 65.00 seconds
+  OS & Kernel  : Linux 7.1.3-201.fc44.x86_64
+  RAM          : 30Gi
+  Time         : 2026-07-19 16:01:53 IST
+  Duration     : 53.57 seconds
 
 ----------------------------------------
  Results
@@ -21,75 +21,75 @@ System Information
 
   [RSA-2048] Verify 100 Packages
     Iterations     : 10
-    Average        : 66444.5733 us
-    Median         : 66302.2930 us
-    Minimum        : 64720.3470 us
-    Maximum        : 68580.1600 us
-    Std Dev        : 1340.5128 us
-    95% CI         : ±830.8584 us
-    Ops/sec        : 15.05
+    Average        : 58381.1911 us
+    Median         : 58374.6790 us
+    Minimum        : 58349.6370 us
+    Maximum        : 58428.3350 us
+    Std Dev        : 29.7361 us
+    95% CI         : ±18.4306 us
+    Ops/sec        : 17.13
     Rel. Slowdown  : 1.0000x
     Overhead       : 0.0000 %
 
   [ML-DSA-65] Verify 100 Packages
     Iterations     : 10
-    Average        : 269048.0898 us
-    Median         : 269215.5760 us
-    Minimum        : 260855.8910 us
-    Maximum        : 277331.7290 us
-    Std Dev        : 5582.3061 us
-    95% CI         : ±3459.9492 us
-    Ops/sec        : 3.72
-    Rel. Slowdown  : 4.0492x
-    Overhead       : 304.9211 %
+    Average        : 220150.3041 us
+    Median         : 219717.0420 us
+    Minimum        : 219373.5290 us
+    Maximum        : 221398.1610 us
+    Std Dev        : 813.0428 us
+    95% CI         : ±503.9292 us
+    Ops/sec        : 4.54
+    Rel. Slowdown  : 3.7709x
+    Overhead       : 277.0911 %
 
   [RSA-2048] Verify 500 Packages
     Iterations     : 10
-    Average        : 333772.8694 us
-    Median         : 333146.9625 us
-    Minimum        : 331093.6190 us
-    Maximum        : 338707.4560 us
-    Std Dev        : 2178.2482 us
-    95% CI         : ±1350.0922 us
-    Ops/sec        : 3.00
+    Average        : 292603.5225 us
+    Median         : 292433.3665 us
+    Minimum        : 291515.1630 us
+    Maximum        : 294593.2640 us
+    Std Dev        : 1038.6243 us
+    95% CI         : ±643.7460 us
+    Ops/sec        : 3.42
     Rel. Slowdown  : 1.0000x
     Overhead       : 0.0000 %
 
   [ML-DSA-65] Verify 500 Packages
     Iterations     : 10
-    Average        : 1357699.0869 us
-    Median         : 1344661.9575 us
-    Minimum        : 1333589.3330 us
-    Maximum        : 1466796.2600 us
-    Std Dev        : 39507.7085 us
-    95% CI         : ±24487.1314 us
-    Ops/sec        : 0.74
-    Rel. Slowdown  : 4.0677x
-    Overhead       : 306.7734 %
+    Average        : 1099172.7688 us
+    Median         : 1098959.3320 us
+    Minimum        : 1097324.5860 us
+    Maximum        : 1100820.9560 us
+    Std Dev        : 1140.2199 us
+    95% CI         : ±706.7156 us
+    Ops/sec        : 0.91
+    Rel. Slowdown  : 3.7565x
+    Overhead       : 275.6526 %
 
   [RSA-2048] Verify 1000 Packages
     Iterations     : 10
-    Average        : 663680.0318 us
-    Median         : 664467.3040 us
-    Minimum        : 654671.4800 us
-    Maximum        : 675352.8840 us
-    Std Dev        : 5607.3284 us
-    95% CI         : ±3475.4581 us
-    Ops/sec        : 1.51
+    Average        : 584910.7802 us
+    Median         : 584748.8340 us
+    Minimum        : 584546.1180 us
+    Maximum        : 586315.0570 us
+    Std Dev        : 511.1957 us
+    95% CI         : ±316.8424 us
+    Ops/sec        : 1.71
     Rel. Slowdown  : 1.0000x
     Overhead       : 0.0000 %
 
   [ML-DSA-65] Verify 1000 Packages
     Iterations     : 10
-    Average        : 2708943.8007 us
-    Median         : 2686766.3180 us
-    Minimum        : 2661856.5260 us
-    Maximum        : 2892562.1260 us
-    Std Dev        : 67405.1364 us
-    95% CI         : ±41778.1364 us
-    Ops/sec        : 0.37
-    Rel. Slowdown  : 4.0817x
-    Overhead       : 308.1702 %
+    Average        : 2197837.5742 us
+    Median         : 2197853.1605 us
+    Minimum        : 2195831.8740 us
+    Maximum        : 2199764.9090 us
+    Std Dev        : 1236.6069 us
+    95% CI         : ±766.4569 us
+    Ops/sec        : 0.45
+    Rel. Slowdown  : 3.7576x
+    Overhead       : 275.7560 %
 
 ========================================
  End of Log

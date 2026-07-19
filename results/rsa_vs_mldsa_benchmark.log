@@ -4,16 +4,16 @@
 ========================================
 
 System Information
-  Compiler     : GNU g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0
+  Compiler     : Clang Clang 16.1.x
   Opt. Flags   :  -march=native -fomit-frame-pointer 
-  OpenSSL      : OpenSSL 3.5.5 27 Jan 2026
-  CPU          : AuthenticAMD AMD Ryzen 7 5800H with Radeon Graphics
+  OpenSSL      : OpenSSL 3.5.7 9 Jun 2026
+  CPU          : AuthenticAMD AMD Ryzen 7 8845HS w/ Radeon 780M Graphics
   CPU Arch     : x86_64
   Cores        : 8 Physical / 16 Logical
-  OS & Kernel  : Linux 6.18.33.2-microsoft-standard-WSL2
-  RAM          : 7.4Gi
-  Time         : 2026-07-19 09:20:31 UTC
-  Duration     : 11.49 seconds
+  OS & Kernel  : Linux 7.1.3-201.fc44.x86_64
+  RAM          : 30Gi
+  Time         : 2026-07-19 16:01:32 IST
+  Duration     : 8.21 seconds
 
 ----------------------------------------
  Key & Signature Sizes (DER-encoded)
@@ -21,7 +21,7 @@ System Information
 
   [RSA-2048]
     Public Key  : 294 bytes
-    Private Key : 1190 bytes
+    Private Key : 1192 bytes
     Signature   : 256 bytes
 
   [ML-DSA-65]
@@ -40,75 +40,75 @@ System Information
 
   [RSA-2048] Key Generation
     Iterations     : 100
-    Mean           : 53605.3683 us
-    Median         : 45354.3895 us
-    Minimum        : 13237.1550 us
-    Maximum        : 258375.7280 us
-    Std Dev        : 36766.0592 us
-    95% CI         : ±7206.1476 us
-    Ops/sec        : 18.65
+    Mean           : 39697.1479 us
+    Median         : 35882.9620 us
+    Minimum        : 7714.2140 us
+    Maximum        : 128279.5150 us
+    Std Dev        : 23463.8462 us
+    95% CI         : ±4598.9139 us
+    Ops/sec        : 25.19
     Rel. Slowdown  : 1.0000x
     Overhead       : 0.0000 %
 
   [RSA-2048] Sign
     Iterations     : 100
-    Mean           : 757.3417 us
-    Median         : 797.0540 us
-    Minimum        : 602.2640 us
-    Maximum        : 1353.4800 us
-    Std Dev        : 144.5298 us
-    95% CI         : ±28.3278 us
-    Ops/sec        : 1320.41
+    Mean           : 237.4867 us
+    Median         : 229.1220 us
+    Minimum        : 228.7420 us
+    Maximum        : 470.8390 us
+    Std Dev        : 41.1706 us
+    95% CI         : ±8.0694 us
+    Ops/sec        : 4210.76
     Rel. Slowdown  : 1.0000x
     Overhead       : 0.0000 %
 
   [RSA-2048] Verify
     Iterations     : 100
-    Mean           : 19.7297 us
-    Median         : 19.5070 us
-    Minimum        : 19.4460 us
-    Maximum        : 37.5110 us
-    Std Dev        : 1.8354 us
-    95% CI         : ±0.3597 us
-    Ops/sec        : 50685.06
+    Mean           : 17.7474 us
+    Median         : 17.6730 us
+    Minimum        : 17.5940 us
+    Maximum        : 21.4210 us
+    Std Dev        : 0.5200 us
+    95% CI         : ±0.1019 us
+    Ops/sec        : 56346.31
     Rel. Slowdown  : 1.0000x
     Overhead       : 0.0000 %
 
   [ML-DSA-65] Key Generation
     Iterations     : 100
-    Mean           : 194.0767 us
-    Median         : 183.4435 us
-    Minimum        : 182.1060 us
-    Maximum        : 358.0800 us
-    Std Dev        : 29.8735 us
-    95% CI         : ±5.8552 us
-    Ops/sec        : 5152.60
-    Rel. Slowdown  : 0.0036x
-    Overhead       : -99.6380 %
+    Mean           : 161.1307 us
+    Median         : 160.1825 us
+    Minimum        : 158.6100 us
+    Maximum        : 202.6730 us
+    Std Dev        : 4.5086 us
+    95% CI         : ±0.8837 us
+    Ops/sec        : 6206.14
+    Rel. Slowdown  : 0.0041x
+    Overhead       : -99.5941 %
 
   [ML-DSA-65] Sign
     Iterations     : 100
-    Mean           : 1069.3698 us
-    Median         : 831.5590 us
-    Minimum        : 347.2890 us
-    Maximum        : 4755.3420 us
-    Std Dev        : 778.6130 us
-    95% CI         : ±152.6081 us
-    Ops/sec        : 935.13
-    Rel. Slowdown  : 1.4120x
-    Overhead       : 41.2004 %
+    Mean           : 909.8043 us
+    Median         : 718.0055 us
+    Minimum        : 304.3540 us
+    Maximum        : 3762.7640 us
+    Std Dev        : 724.4960 us
+    95% CI         : ±142.0012 us
+    Ops/sec        : 1099.14
+    Rel. Slowdown  : 3.8310x
+    Overhead       : 283.0970 %
 
   [ML-DSA-65] Verify
     Iterations     : 100
-    Mean           : 209.8946 us
-    Median         : 184.5355 us
-    Minimum        : 183.5380 us
-    Maximum        : 767.0910 us
-    Std Dev        : 70.1457 us
-    95% CI         : ±13.7486 us
-    Ops/sec        : 4764.30
-    Rel. Slowdown  : 10.6385x
-    Overhead       : 963.8519 %
+    Mean           : 159.7241 us
+    Median         : 159.0100 us
+    Minimum        : 158.3690 us
+    Maximum        : 166.0230 us
+    Std Dev        : 1.7282 us
+    95% CI         : ±0.3387 us
+    Ops/sec        : 6260.80
+    Rel. Slowdown  : 8.9999x
+    Overhead       : 799.9863 %
 
 ========================================
  End of Log

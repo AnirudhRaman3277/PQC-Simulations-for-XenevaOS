@@ -4,16 +4,16 @@
 ========================================
 
 System Information
-  Compiler     : GNU g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0
+  Compiler     : Clang Clang 16.1.x
   Opt. Flags   :  -march=native -fomit-frame-pointer 
-  OpenSSL      : OpenSSL 3.5.5 27 Jan 2026
-  CPU          : AuthenticAMD AMD Ryzen 7 5800H with Radeon Graphics
+  OpenSSL      : OpenSSL 3.5.7 9 Jun 2026
+  CPU          : AuthenticAMD AMD Ryzen 7 8845HS w/ Radeon 780M Graphics
   CPU Arch     : x86_64
   Cores        : 8 Physical / 16 Logical
-  OS & Kernel  : Linux 6.18.33.2-microsoft-standard-WSL2
-  RAM          : 7.4Gi
-  Time         : 2026-07-19 09:20:28 UTC
-  Duration     : 3.32 seconds
+  OS & Kernel  : Linux 7.1.3-201.fc44.x86_64
+  RAM          : 30Gi
+  Time         : 2026-07-19 16:01:30 IST
+  Duration     : 1.90 seconds
 
 ----------------------------------------
  Results
@@ -21,87 +21,87 @@ System Information
 
   [ECDH-P256] Key Generation
     Iterations     : 5000
-    Average        : 25.8261 us
-    Median         : 21.7310 us
-    Minimum        : 21.2510 us
-    Maximum        : 208.3310 us
-    Std Dev        : 10.9797 us
-    95% CI         : ±0.3043 us
-    Ops/sec        : 38720.50
+    Average        : 12.5862 us
+    Median         : 12.4930 us
+    Minimum        : 12.2430 us
+    Maximum        : 27.3710 us
+    Std Dev        : 0.6795 us
+    95% CI         : ±0.0188 us
+    Ops/sec        : 79452.21
     Rel. Slowdown  : 1.0000x
     Overhead       : 0.0000 %
 
   [ECDH-P256] Shared Secret
     Iterations     : 5000
-    Average        : 80.9575 us
-    Median         : 72.4270 us
-    Minimum        : 72.0870 us
-    Maximum        : 2310.4780 us
-    Std Dev        : 40.1135 us
-    95% CI         : ±1.1119 us
-    Ops/sec        : 12352.17
+    Average        : 49.4872 us
+    Median         : 49.2630 us
+    Minimum        : 48.8630 us
+    Maximum        : 107.1030 us
+    Std Dev        : 1.2398 us
+    95% CI         : ±0.0344 us
+    Ops/sec        : 20207.24
     Rel. Slowdown  : 1.0000x
     Overhead       : 0.0000 %
 
   [ECDH-P256] Full Key Exchange
     Iterations     : 5000
-    Average        : 138.6788 us
-    Median         : 119.0260 us
-    Minimum        : 116.5810 us
-    Maximum        : 1459.5620 us
-    Std Dev        : 50.3107 us
-    95% CI         : ±1.3945 us
-    Ops/sec        : 7210.91
+    Average        : 74.9687 us
+    Median         : 74.6410 us
+    Minimum        : 73.7190 us
+    Maximum        : 124.1850 us
+    Std Dev        : 1.5238 us
+    95% CI         : ±0.0422 us
+    Ops/sec        : 13338.90
     Rel. Slowdown  : 1.0000x
     Overhead       : 0.0000 %
 
   [ML-KEM-768] Key Generation
     Iterations     : 5000
-    Average        : 70.5523 us
-    Median         : 63.2000 us
-    Minimum        : 61.8370 us
-    Maximum        : 493.1770 us
-    Std Dev        : 19.7530 us
-    95% CI         : ±0.5475 us
-    Ops/sec        : 14173.89
-    Rel. Slowdown  : 2.7318x
-    Overhead       : 173.1819 %
+    Average        : 40.9313 us
+    Median         : 40.6970 us
+    Minimum        : 40.0250 us
+    Maximum        : 112.2110 us
+    Std Dev        : 1.5616 us
+    95% CI         : ±0.0433 us
+    Ops/sec        : 24431.16
+    Rel. Slowdown  : 3.2521x
+    Overhead       : 225.2085 %
 
   [ML-KEM-768] Encapsulation
     Iterations     : 5000
-    Average        : 49.9903 us
-    Median         : 45.4860 us
-    Minimum        : 45.1260 us
-    Maximum        : 981.6740 us
-    Std Dev        : 25.1247 us
-    95% CI         : ±0.6964 us
-    Ops/sec        : 20003.87
+    Average        : 29.5927 us
+    Median         : 29.4160 us
+    Minimum        : 29.2360 us
+    Maximum        : 67.9780 us
+    Std Dev        : 1.0700 us
+    95% CI         : ±0.0297 us
+    Ops/sec        : 33792.12
     Rel. Slowdown  : 1.0000x
     Overhead       : 0.0000 %
 
   [ML-KEM-768] Decapsulation
     Iterations     : 5000
-    Average        : 73.8271 us
-    Median         : 67.2080 us
-    Minimum        : 66.7970 us
-    Maximum        : 2600.7700 us
-    Std Dev        : 47.1434 us
-    95% CI         : ±1.3067 us
-    Ops/sec        : 13545.16
+    Average        : 43.9329 us
+    Median         : 43.7330 us
+    Minimum        : 43.4920 us
+    Maximum        : 81.6340 us
+    Std Dev        : 1.0762 us
+    95% CI         : ±0.0298 us
+    Ops/sec        : 22761.99
     Rel. Slowdown  : 1.0000x
     Overhead       : 0.0000 %
 
   [ML-KEM-768] Full Key Exchange
     Iterations     : 5000
-    Average        : 202.7692 us
-    Median         : 177.6280 us
-    Minimum        : 175.8540 us
-    Maximum        : 4684.2760 us
-    Std Dev        : 90.6565 us
-    95% CI         : ±2.5129 us
-    Ops/sec        : 4931.71
-    Rel. Slowdown  : 1.4622x
-    Overhead       : 46.2150 %
+    Average        : 115.4297 us
+    Median         : 114.5970 us
+    Minimum        : 113.7740 us
+    Maximum        : 816.2210 us
+    Std Dev        : 14.2187 us
+    95% CI         : ±0.3941 us
+    Ops/sec        : 8663.28
+    Rel. Slowdown  : 1.5397x
+    Overhead       : 53.9706 %
 
 ========================================
  End of Log
