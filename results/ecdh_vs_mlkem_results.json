@@ -2,7 +2,7 @@
   "experiment": "Experiment 1: ECDH P-256 vs ML-KEM-768 — Secure Session Establishment",
   "system": {
     "compiler": "Clang",
-    "compiler_version": "Clang 16.1.x",
+    "compiler_version": "Clang 22.1.8",
     "optimization_flags": " -march=native -fomit-frame-pointer ",
     "openssl": "OpenSSL 3.5.7 9 Jun 2026",
     "cpu_vendor": "AuthenticAMD",
@@ -19,7 +19,7 @@
     {
       "algorithm": "ECDH-P256",
       "compiler": "Clang",
-      "compiler_version": "Clang 16.1.x",
+      "compiler_version": "Clang 22.1.8",
       "optimization_flags": " -march=native -fomit-frame-pointer ",
       "cpu_model": "AMD Ryzen 7 8845HS w/ Radeon 780M Graphics",
       "operating_system": "Linux",
@@ -40,7 +40,7 @@
     {
       "algorithm": "ECDH-P256",
       "compiler": "Clang",
-      "compiler_version": "Clang 16.1.x",
+      "compiler_version": "Clang 22.1.8",
       "optimization_flags": " -march=native -fomit-frame-pointer ",
       "cpu_model": "AMD Ryzen 7 8845HS w/ Radeon 780M Graphics",
       "operating_system": "Linux",
@@ -61,7 +61,7 @@
     {
       "algorithm": "ECDH-P256",
       "compiler": "Clang",
-      "compiler_version": "Clang 16.1.x",
+      "compiler_version": "Clang 22.1.8",
       "optimization_flags": " -march=native -fomit-frame-pointer ",
       "cpu_model": "AMD Ryzen 7 8845HS w/ Radeon 780M Graphics",
       "operating_system": "Linux",
@@ -82,7 +82,7 @@
     {
       "algorithm": "ML-KEM-768",
       "compiler": "Clang",
-      "compiler_version": "Clang 16.1.x",
+      "compiler_version": "Clang 22.1.8",
       "optimization_flags": " -march=native -fomit-frame-pointer ",
       "cpu_model": "AMD Ryzen 7 8845HS w/ Radeon 780M Graphics",
       "operating_system": "Linux",
@@ -103,7 +103,7 @@
     {
       "algorithm": "ML-KEM-768",
       "compiler": "Clang",
-      "compiler_version": "Clang 16.1.x",
+      "compiler_version": "Clang 22.1.8",
       "optimization_flags": " -march=native -fomit-frame-pointer ",
       "cpu_model": "AMD Ryzen 7 8845HS w/ Radeon 780M Graphics",
       "operating_system": "Linux",
@@ -124,7 +124,7 @@
     {
       "algorithm": "ML-KEM-768",
       "compiler": "Clang",
-      "compiler_version": "Clang 16.1.x",
+      "compiler_version": "Clang 22.1.8",
       "optimization_flags": " -march=native -fomit-frame-pointer ",
       "cpu_model": "AMD Ryzen 7 8845HS w/ Radeon 780M Graphics",
       "operating_system": "Linux",
@@ -145,7 +145,7 @@
     {
       "algorithm": "ML-KEM-768",
       "compiler": "Clang",
-      "compiler_version": "Clang 16.1.x",
+      "compiler_version": "Clang 22.1.8",
       "optimization_flags": " -march=native -fomit-frame-pointer ",
       "cpu_model": "AMD Ryzen 7 8845HS w/ Radeon 780M Graphics",
       "operating_system": "Linux",

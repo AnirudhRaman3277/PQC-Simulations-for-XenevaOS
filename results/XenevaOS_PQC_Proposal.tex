@@ -32,8 +32,8 @@ To ensure the proposed algorithms meet the strict performance and stability requ
 \begin{itemize}
     \item \textbf{CPU Architecture:} AMD Ryzen 7 8845HS (8 Physical / 16 Logical cores, highly optimized for cryptographic vector extensions). CPU Turbo Mode was explicitly disabled to prevent frequency scaling and ensure strictly consistent latency measurements.
     \item \textbf{System Memory (RAM):} 30 GiB allocated
-    \item \textbf{Operating System Kernel:} Linux 7.1.3-201.fc44.x86_64 (approximating XenevaOS underlying abstractions)
-    \item \textbf{Compiler Toolchain:} Clang C++ Compiler version 16.1.x with standard optimization flags enabled.
+    \item \textbf{Operating System Kernel:} Linux 7.1.3-201 (approximating XenevaOS underlying abstractions)
+    \item \textbf{Compiler Toolchain:} Clang C++ Compiler version 22.1.8 with standard optimization flags enabled.
 \end{itemize}
 
 To guarantee statistical significance and eliminate systematic noise from CPU frequency scaling or cold caches, each simulation consisted of a rigorous warmup phase (minimum 100 iterations) followed by thousands of measured execution loops. This allowed us to calculate highly reliable mean latencies, variances, and operational throughput metrics.
