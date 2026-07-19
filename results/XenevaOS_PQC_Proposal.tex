@@ -240,7 +240,7 @@ The transition from Elliptic Curve Diffie-Hellman (ECDH P-256) to ML-KEM-768 rep
 \textbf{Comprehensive Data Analysis:} 
 Our empirical benchmarks indicate that a full ML-KEM-768 key exchange takes $110.50~\mu s$ compared to ECDH's $77.29~\mu s$. While this initially appears as a $42.9\%$ overhead, a deeper breakdown of the operation reveals that the overhead is entirely localized to the key generation phase. ML-KEM-768 key generation takes $39.82~\mu s$, which is significantly slower than ECDH's $14.48~\mu s$. 
 
-However, the encapsulation phase itself is extraordinarily fast. ML-KEM encapsulates the shared secret in just $28.87~\mu s$, yielding an exceptional throughput capable of over 34,000 operations per second. Decapsulation is similarly efficient at $42.63~\mu s$. This asymmetry means that in scenarios where the public key is relatively static or pre-distributed, the active operational overhead is actually much lower than classical elliptic curves.
+However, the encapsulation phase itself is extraordinarily fast. ML-KEM encapsulates the shared secret in just $29.59~\mu s$, yielding an exceptional throughput capable of over 33,700 operations per second. Decapsulation is similarly efficient at $43.93~\mu s$. This asymmetry means that in scenarios where the public key is relatively static or pre-distributed, the active operational overhead is actually much lower than classical elliptic curves.
 
 \begin{figure}[htbp]
 \centering
@@ -255,7 +255,7 @@ Digital signatures serve as the absolute bedrock of trust in XenevaOS. They are 
 \textbf{Comprehensive Data Analysis:} 
 The data reveals a dramatic inversion of performance characteristics between the two algorithms. ML-DSA-65 provides an astonishing improvement in key generation time. Taking only $212.29~\mu s$, it vastly outperforms RSA-2048's computationally heavy and prime-generation-dependent runtime of $51.8~ms$. This makes ML-DSA highly suitable for ephemeral identities and rapid certificate rotation architectures.
 
-Conversely, the verification stage highlights a significant bottleneck. ML-DSA verification takes $208.24~\mu s$, making it approximately $9\times$ slower than RSA verification ($22.51~\mu s$). Because operating system environments typically verify signatures far more frequently than they generate them (e.g., verifying a kernel module signature upon every system boot), this verification overhead poses a structural challenge that must be carefully managed. System architects will need to employ caching layers and parallelization to mitigate this impact in high-frequency subsystems.
+Conversely, the verification stage highlights a significant bottleneck. ML-DSA verification takes $159.72~\mu s$, making it approximately $9\times$ slower than RSA verification ($17.75~\mu s$). Because operating system environments typically verify signatures far more frequently than they generate them (e.g., verifying a kernel module signature upon every system boot), this verification overhead poses a structural challenge that must be carefully managed. System architects will need to employ caching layers and parallelization to mitigate this impact in high-frequency subsystems.
 
 \begin{figure}[htbp]
 \centering
@@ -268,9 +268,9 @@ Conversely, the verification stage highlights a significant bottleneck. ML-DSA v
 Secure boot relies on the root of trust verifying digital signatures at power-on to ensure kernel integrity before execution. Any latency introduced here directly impacts the perceived boot time and user experience. We simulated the exact verification of a standard 4MB XenevaOS kernel image to measure this real-world impact.
 
 \textbf{Comprehensive Data Analysis:} 
-While the primitive-level benchmarks showed ML-DSA verification to be $9\times$ slower than RSA, applying this to a large payload provides a more grounded perspective. The absolute time required to verify the 4MB kernel using RSA-2048 was $2.01~ms$. Substituting this with ML-DSA-65 resulted in a verification time of $8.22~ms$. 
+While the primitive-level benchmarks showed ML-DSA verification to be $9\times$ slower than RSA, applying this to a large payload provides a more grounded perspective. The absolute time required to verify the 4MB kernel using RSA-2048 was $2.28~ms$. Substituting this with ML-DSA-65 resulted in a verification time of $8.34~ms$. 
 
-Although the relative slowdown factor remains, an absolute overhead of roughly $6.2~ms$ during the boot sequence is entirely imperceptible to the end-user. The hardware initialization and block-device reading phases dominate the boot cycle by several orders of magnitude. Therefore, this data conclusively proves that XenevaOS can safely transition its secure bootloader architecture to ML-DSA-65 without violating strict boot-time performance budgets.
+Although the relative slowdown factor remains, an absolute overhead of roughly $6.06~ms$ during the boot sequence is entirely imperceptible to the end-user. The hardware initialization and block-device reading phases dominate the boot cycle by several orders of magnitude. Therefore, this data conclusively proves that XenevaOS can safely transition its secure bootloader architecture to ML-DSA-65 without violating strict boot-time performance budgets.
 
 \begin{figure}[htbp]
 \centering
@@ -283,7 +283,7 @@ Although the relative slowdown factor remains, an absolute overhead of roughly $
 Package management and system updates in XenevaOS require verifying cryptographic signatures for hundreds or thousands of software packages simultaneously. We simulated batch verifications of 1MB packages to benchmark throughput scaling.
 
 \textbf{Comprehensive Data Analysis:} 
-The data confirms that RSA-2048's exceptionally fast verification speed allows for very high throughput, verifying 1000 packages in roughly 664~ms. Conversely, ML-DSA-65 scales linearly with its heavier verification overhead, taking approximately 2709~ms for the same 1000-package batch. While this introduces a $\sim 4\times$ slowdown, a total delay of 2.7 seconds to cryptographically verify a massive OS update is completely acceptable for background package managers and does not block critical paths.
+The data confirms that RSA-2048's exceptionally fast verification speed allows for very high throughput, verifying 1000 packages in roughly 584.9~ms. Conversely, ML-DSA-65 scales linearly with its heavier verification overhead, taking approximately 2197.8~ms for the same 1000-package batch. While this introduces a $\sim 3.76\times$ slowdown, a total delay of 2.2 seconds to cryptographically verify a massive OS update is completely acceptable for background package managers and does not block critical paths.
 
 \begin{figure}[htbp]
 \centering
@@ -298,9 +298,9 @@ Within the XenevaOS micro-kernel inspired architecture, Secure Inter-Process Com
 \textbf{Comprehensive Data Analysis:} 
 Counterintuitively, and perhaps representing the most promising finding of this entire evaluation, the Post-Quantum IPC pipeline actually \textbf{outperformed} the classical pipeline. 
 
-The simulated classical pipeline (ECDH Key Exchange + SHA-256 Key Derivation + AES-256-GCM Encryption) processed the 4KB IPC roundtrip in $126.88~\mu s$. By contrast, the post-quantum pipeline (ML-KEM + SHA-256 + AES-256-GCM) completed the exact same operation in just $114.98~\mu s$. 
+The simulated classical pipeline (ECDH Key Exchange + SHA-256 Key Derivation + AES-256-GCM Encryption) processed the 4KB IPC roundtrip in $127.92~\mu s$. By contrast, the post-quantum pipeline (ML-KEM + SHA-256 + AES-256-GCM) completed the exact same operation in just $118.73~\mu s$. 
 
-This $9.4\%$ performance \textit{increase} completely shatters the misconception that quantum-resistance necessarily incurs a performance penalty. The massive mathematical efficiency of lattice-based encapsulation operations cleanly outperforms the heavy scalar multiplication required for classical elliptic curve derivation. This makes ML-KEM an exceptional, high-performance choice for securing transient IPC channels.
+This $7.2\%$ performance \textit{increase} completely shatters the misconception that quantum-resistance necessarily incurs a performance penalty. The massive mathematical efficiency of lattice-based encapsulation operations cleanly outperforms the heavy scalar multiplication required for classical elliptic curve derivation. This makes ML-KEM an exceptional, high-performance choice for securing transient IPC channels.
 
 \begin{figure}[htbp]
 \centering
@@ -313,8 +313,8 @@ This $9.4\%$ performance \textit{increase} completely shatters the misconception
 Based on the empirical data gathered during these exhaustive simulations, we propose the following concrete, strategic actions for the XenevaOS engineering roadmap:
 
 \begin{enumerate}
-    \item \textbf{Mandate ML-DSA for Secure Boot:} Given the negligible $6.2~ms$ overhead, XenevaOS should immediately begin phasing out RSA for bootloader and firmware signatures. 
-    \item \textbf{Transition IPC to ML-KEM immediately:} The measurable $9.4\%$ performance increase in secure messaging makes ML-KEM the objectively superior choice for bootstrapping secure IPC tunnels. It offers enhanced security and better performance simultaneously.
+    \item \textbf{Mandate ML-DSA for Secure Boot:} Given the negligible $6.06~ms$ overhead, XenevaOS should immediately begin phasing out RSA for bootloader and firmware signatures. 
+    \item \textbf{Transition IPC to ML-KEM immediately:} The measurable $7.2\%$ performance increase in secure messaging makes ML-KEM the objectively superior choice for bootstrapping secure IPC tunnels. It offers enhanced security and better performance simultaneously.
     \item \textbf{Implement Signature Caching for Daemons:} Due to the higher verification latency of ML-DSA, subsystems that require high-frequency authentication (like package managers and daemon execution control) must implement aggressive signature caching mechanisms (e.g., verifying once and trusting the inode/memory-mapping) to prevent system-wide performance degradation.
 \end{enumerate}
 
