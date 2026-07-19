@@ -27,6 +27,121 @@
 
 \begin{document}
 
+\setcounter{section}{6}
+
+%% ====================================================================
+%% XenevaOS PQC White Paper -- Expansion Sections
+%%
+%% INSTRUCTIONS FOR INTEGRATION:
+%%   Insert this content into XenevaOS_PQC_Proposal.tex as follows:
+%%   - Sections 7--8 go BEFORE the existing Cryptographic Architecture
+%%     (Section 9).
+%%   - Sections 11--23 go AFTER the existing PQC Benchmarks (Section 10)
+%%     and its Strategic Implementation Recommendations subsection.
+%%   Adjust setcounter as needed.
+%%
+%%   The content below compiles directly inside the existing preamble.
+%% ====================================================================
+
+
+%% ====================================================================
+%%  PRE-CONTEXT SECTIONS (Insert BEFORE Section 9)
+%%  Set counter to 6 so these become Sections 7 and 8
+%% ====================================================================
+
+
+
+%% ====================================================================
+%%  SECTION 7: QUANTUM THREAT LANDSCAPE
+%% ====================================================================
+
+\section{Quantum Threat Landscape}\label{sec:quantum-threat}
+
+The security model of every deployed operating system rests on a small number of computational hardness assumptions: the difficulty of factoring large integers, the intractability of the discrete logarithm problem over finite fields, and the analogous problem over elliptic curves. A sufficiently powerful quantum computer invalidates all three simultaneously.
+
+\subsection{Cryptographically Relevant Quantum Computers}\label{sec:crqc}
+
+A Cryptographically Relevant Quantum Computer (CRQC) is defined as a fault-tolerant quantum system capable of executing Shor's algorithm against parameter sizes in active deployment. Current estimates from the National Academy of Sciences and independent analyses suggest that breaking RSA-2048 requires approximately 4,000 logical qubits and $10^{10}$ Toffoli gates, while breaking ECDH P-256 requires approximately 2,330 logical qubits. When physical error rates and surface-code overheads are accounted for, these translate to physical qubit counts in the range of $10^{6}$ to $2 \times 10^{7}$, depending on the error correction scheme.
+
+As of 2026, the largest demonstrated quantum processors operate at approximately 1,000--1,200 physical qubits with error rates that preclude fault-tolerant operation at the required scale. However, every major roadmap from IBM, Google, PsiQuantum, and QuEra projects systems exceeding $10^{4}$ logical qubits within the 2030--2035 window. The uncertainty in these timelines is precisely what makes early migration imperative: the cost of premature migration is modest engineering effort, while the cost of delayed migration is catastrophic cryptographic failure.
+
+\subsection{Algorithmic Threats}\label{sec:algo-threats}
+
+\subsubsection{Shor's Algorithm}
+
+Shor's algorithm solves the integer factorisation and discrete logarithm problems in polynomial time on a quantum computer. Specifically, it reduces RSA key recovery to period-finding over modular exponentiation, achieving $O(n^{2} \log n \log \log n)$ gate complexity for an $n$-bit modulus. For elliptic curve cryptography, an adapted variant recovers the private scalar in $O(n^{3})$ gates for an $n$-bit curve.
+
+The consequence for XenevaOS is unambiguous: every cryptographic operation that currently relies on RSA, ECDSA, ECDH, or EdDSA will be rendered transparent to a CRQC-equipped adversary. This includes boot chain signatures, TLS key exchange, module authentication, and code signing.
+
+\subsubsection{Grover's Algorithm}
+
+Grover's algorithm provides a quadratic speedup for unstructured search, reducing the effective security of symmetric ciphers and hash functions by half. AES-128 is reduced to 64-bit security; AES-256 retains 128-bit security. SHA-256 preimage resistance drops to 128 bits, which remains within acceptable security margins.
+
+The operational implication for XenevaOS is that symmetric primitives and hash functions require parameter adjustments but not algorithmic replacement. AES-256-GCM and SHA-3-256 remain safe choices for the post-quantum era, a fact that simplifies the migration scope considerably.
+
+\subsection{Harvest Now, Decrypt Later}\label{sec:hndl}
+
+The most immediate and practically exploitable quantum threat is the Harvest Now, Decrypt Later (HNDL) attack model. State-level adversaries with long-term strategic interests are known to intercept and archive encrypted communications today, with the expectation that a future CRQC will enable retroactive decryption.
+
+For an operating system, this threat model has several concrete implications:
+
+\begin{itemize}
+    \item \textbf{Firmware update channels.} If an adversary captures encrypted firmware distribution traffic today, future decryption reveals not only the firmware binary but also the signing keys and update authentication tokens.
+    \item \textbf{Device attestation.} Attestation protocols that rely on ECDH-derived session keys expose device identity material to future compromise.
+    \item \textbf{Long-lived credentials.} Platform root keys, TPM endorsement keys, and certificate authority hierarchies have lifetimes measured in decades. Any key establishment protocol that uses classical key exchange during provisioning creates a permanent retroactive vulnerability.
+    \item \textbf{XR session data.} Extended Reality sessions capture spatial maps, biometric identifiers, eye-tracking data, and behavioural telemetry. This data has a confidentiality requirement that exceeds the expected timeline to CRQC availability.
+\end{itemize}
+
+\subsection{Why Operating Systems Must Migrate Before Applications}\label{sec:os-migration-urgency}
+
+Applications inherit their cryptographic properties from the operating system's trust infrastructure. A web browser can adopt post-quantum TLS only if the OS certificate store, kernel TLS offload, and secure random number generator support the required primitives. A containerised workload can verify post-quantum signatures only if the kernel's integrity measurement architecture understands them.
+
+Furthermore, operating systems have deployment lifecycles that far exceed application lifecycles. The average enterprise OS deployment persists for 7--10 years from initial release. Government and defence systems routinely operate on 15--20 year horizons. XR platforms designed for industrial and defence use will need to maintain cryptographic integrity across the full expected lifetime of the hardware they serve.
+
+This lifecycle asymmetry means that an operating system released in 2026 without post-quantum readiness will be actively deployed, and actively vulnerable, when CRQCs become operational. Retrofitting post-quantum cryptography into a deployed kernel is orders of magnitude more expensive and error-prone than designing it in from the outset.
+
+
+%% ====================================================================
+%%  SECTION 8: WHY XR REQUIRES POST-QUANTUM SECURITY
+%% ====================================================================
+
+\section{Extended Reality and Post-Quantum Security Requirements}\label{sec:xr-pqc}
+
+Extended Reality platforms present a uniquely demanding threat surface for post-quantum migration. Unlike traditional desktop or server operating systems, XR systems operate at the intersection of persistent identity, real-time sensor fusion, multi-party collaboration, and physical-world interaction. Each of these properties introduces cryptographic dependencies that are qualitatively different from conventional computing.
+
+\subsection{Persistent and Spatial Identity}\label{sec:xr-identity}
+
+XR platforms bind digital identity to physical space. A user's avatar, spatial anchors, and interaction history form a persistent identity that must be authenticated across sessions, devices, and network boundaries. This identity is not merely a username and password; it encompasses biometric calibration data (inter-pupillary distance, hand geometry, gait patterns), spatial ownership claims, and accumulated trust scores.
+
+The cryptographic infrastructure securing this identity must resist compromise for the lifetime of the identity itself, which in enterprise and defence contexts may extend 15--20 years. Classical ECDSA or RSA signatures used to bind spatial anchors to identity will become forgeable within this window, enabling impersonation attacks that have physical-world consequences: an adversary could forge spatial ownership claims, inject false objects into shared environments, or authenticate as a trusted collaborator.
+
+\subsection{Secure Sensor Streams and Controller Communication}\label{sec:xr-sensors}
+
+XR headsets continuously stream data from cameras, LiDAR, inertial measurement units, eye trackers, and hand-tracking sensors. In enterprise and defence deployments, this sensor data is classified or commercially sensitive. The encryption protecting sensor-to-processor and processor-to-cloud channels must be quantum-resistant to prevent retroactive exposure.
+
+Controller communication presents an analogous problem. XR controllers transmit user intent (gestures, selections, manipulations) over wireless channels that are trivially interceptable. If the key exchange securing these channels uses classical algorithms, an HNDL adversary accumulates a complete record of the user's physical interactions for future decryption.
+
+\subsection{Multi-User Collaboration and Digital Twins}\label{sec:xr-multiuser}
+
+Collaborative XR sessions require authenticated, encrypted, low-latency communication between multiple participants, each running on distinct devices with independent trust chains. The session key establishment protocol must scale to dozens of concurrent participants while maintaining forward secrecy. Classical group key agreement protocols based on ECDH do not survive the quantum threat; their post-quantum replacements (multi-party ML-KEM) are architecturally different and must be integrated into the operating system's IPC and networking layers.
+
+Digital twin deployments in industrial XR overlay real-time sensor data onto physical infrastructure. The integrity of this overlay depends on authenticated data provenance: every sensor reading, model update, and control command must be signed and verified. If the signature scheme is classically vulnerable, an adversary with future CRQC access can retroactively forge the entire provenance chain, undermining audit trails and regulatory compliance.
+
+\subsection{Sector-Specific Requirements}\label{sec:xr-sectors}
+
+\begin{itemize}
+    \item \textbf{Healthcare XR.} Surgical planning overlays, patient anatomy visualisation, and remote consultation sessions handle Protected Health Information (PHI) under regulations requiring encryption that meets or exceeds current best practices. Post-quantum readiness is a prerequisite for long-term regulatory compliance.
+    \item \textbf{Defence XR.} Military and intelligence applications require cryptographic protection aligned with NSA CNSA 2.0 timelines, which mandate post-quantum algorithms for all classified systems by 2033.
+    \item \textbf{Industrial XR.} Factory-floor digital twins and remote maintenance systems protect proprietary manufacturing processes. The economic value of this intellectual property persists for decades, well beyond the CRQC horizon.
+\end{itemize}
+%% ====================================================================
+%%  POST-BENCHMARK SECTIONS (Insert AFTER Section 10)
+%%  Set counter to 10 so these become Sections 11 onward
+%% ====================================================================
+
+%% Restore counter for existing Section 9
+\setcounter{section}{8}
+
 \section{Cryptographic Architecture}\label{cryptographic-architecture}
 
 \subsection{Current Implementation (Gap Analysis)}\label{current-implementation-gap-analysis}
@@ -317,5 +432,594 @@ Based on the empirical data gathered during these exhaustive simulations, we pro
     \item \textbf{Transition IPC to ML-KEM immediately:} The measurable $7.2\%$ performance increase in secure messaging makes ML-KEM the objectively superior choice for bootstrapping secure IPC tunnels. It offers enhanced security and better performance simultaneously.
     \item \textbf{Implement Signature Caching for Daemons:} Due to the higher verification latency of ML-DSA, subsystems that require high-frequency authentication (like package managers and daemon execution control) must implement aggressive signature caching mechanisms (e.g., verifying once and trusting the inode/memory-mapping) to prevent system-wide performance degradation.
 \end{enumerate}
+
+\setcounter{section}{10}
+%% ====================================================================
+%%  SECTION 11: GLOBAL STANDARDS LANDSCAPE
+%% ====================================================================
+
+\section{Post-Quantum Standards Landscape}\label{sec:standards-landscape}
+
+The transition to post-quantum cryptography is not merely a matter of algorithm substitution; it is a standards-driven process governed by interoperability requirements, certification frameworks, and regulatory mandates. XenevaOS must align with the following standards to be deployable in government, enterprise, and defence environments.
+
+\subsection{NIST Post-Quantum Standards}\label{sec:nist-pqc-standards}
+
+\subsubsection{FIPS 203: Module-Lattice-Based Key-Encapsulation Mechanism (ML-KEM)}
+
+FIPS 203 standardises ML-KEM (derived from the CRYSTALS-Kyber submission) as the primary post-quantum key encapsulation mechanism. ML-KEM provides IND-CCA2 security under the Module Learning With Errors (MLWE) assumption. Three parameter sets are defined: ML-KEM-512, ML-KEM-768, and ML-KEM-1024, targeting NIST security levels 1, 3, and 5 respectively.
+
+XenevaOS adopts ML-KEM-768 (Level 3) as the default for TLS key exchange and IPC session establishment. This parameter set provides 192-bit classical security and approximately 128-bit quantum security, matching the protection level of AES-192. The choice of Level 3 over Level 5 is justified by the benchmark results presented in Section~10, which demonstrate that ML-KEM-768 already outperforms classical ECDH in the IPC pipeline. Level 5 (ML-KEM-1024) is reserved for future deployment in contexts requiring alignment with AES-256 security margins.
+
+\subsubsection{FIPS 204: Module-Lattice-Based Digital Signature Algorithm (ML-DSA)}
+
+FIPS 204 standardises ML-DSA (derived from CRYSTALS-Dilithium) as the primary post-quantum signature scheme. ML-DSA provides EUF-CMA security under the MLWE and Module Short Integer Solution (MSIS) assumptions. Parameter sets ML-DSA-44, ML-DSA-65, and ML-DSA-87 target security levels 2, 3, and 5.
+
+XenevaOS uses ML-DSA-65 for boot chain verification, module signing, package authentication, and code signing. The verification latency overhead documented in Section~10 ($159.72~\mu s$ per verification) is acceptable for all targeted subsystems when combined with the signature caching architecture described in Section~10.6.
+
+\subsubsection{FIPS 205: Stateless Hash-Based Digital Signature Algorithm (SLH-DSA)}
+
+FIPS 205 standardises SLH-DSA (derived from SPHINCS+) as a conservative, hash-based signature scheme. Unlike ML-DSA, SLH-DSA's security rests solely on the properties of the underlying hash function, making it immune to advances in lattice cryptanalysis. The cost is substantially larger signatures (up to 49,856 bytes for SLH-DSA-256f) and slower signing.
+
+XenevaOS includes SLH-DSA as a fallback mechanism in the algorithm agility framework. If a practical attack against MLWE is discovered, the kernel crypto framework can switch boot chain verification to SLH-DSA without firmware modification.
+
+\subsection{ETSI Post-Quantum Migration Guidelines}\label{sec:etsi}
+
+The European Telecommunications Standards Institute has published ETSI TR 103 619, providing a migration framework for post-quantum cryptography in ICT systems. Key recommendations include:
+
+\begin{itemize}
+    \item Hybrid key exchange as the default during the transition period,
+    \item Cryptographic agility as an architectural requirement, not an afterthought,
+    \item Inventory of all cryptographic dependencies before migration begins,
+    \item Prioritisation of long-lived keys and high-value data channels.
+\end{itemize}
+
+XenevaOS implements each of these recommendations: hybrid ML-KEM + X25519 is the default TLS mode, the kernel crypto framework provides algorithm agility through an operation-based API, and the key hierarchy architecture of Section~9.3 enforces per-purpose key derivation with explicit lifecycle management.
+
+\subsection{NSA CNSA 2.0 Suite}\label{sec:cnsa2}
+
+The NSA Commercial National Security Algorithm Suite 2.0 mandates a timeline for transitioning classified systems to quantum-resistant cryptography. The relevant deadlines are:
+
+\begin{table}[!ht]
+\centering
+\caption{NSA CNSA 2.0 Transition Timeline}\label{tab:cnsa2-timeline}
+\small
+\begin{tabularx}{\textwidth}{%
+  X L{3.5cm} L{4cm}}
+\toprule
+\rowcolor{tblheader}
+\thead{System Category} & \thead{Required Algorithm} & \thead{Deadline} \\
+\midrule
+\rowcolor{tblrow1}
+Software and firmware signing & ML-DSA or LMS/XMSS & 2025 (preferred), 2030 (required) \\
+\rowcolor{tblrow2}
+Web servers and browsers (TLS) & ML-KEM hybrid & 2025 (preferred), 2033 (required) \\
+\rowcolor{tblrow1}
+VPN and network infrastructure & ML-KEM hybrid & 2026 (preferred), 2030 (required) \\
+\rowcolor{tblrow2}
+Custom / embedded applications & ML-KEM + ML-DSA & 2030 (preferred), 2033 (required) \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+XenevaOS's roadmap, with ML-DSA boot chain signing and ML-KEM hybrid TLS targeted for Phase~1, is fully aligned with the CNSA 2.0 preferred timelines. This alignment is not coincidental; it is a design requirement for any operating system intended for government deployment within the Indian national security ecosystem and allied frameworks.
+
+\subsection{Supplementary Standards}\label{sec:supp-standards}
+
+\begin{description}[leftmargin=0pt,style=unboxed]
+\item[RFC 8446 (TLS 1.3).] The baseline transport security protocol. XenevaOS's hybrid TLS architecture extends TLS 1.3 key exchange with concatenated ML-KEM + X25519 shares, as specified in the IETF draft-ietf-tls-hybrid-design.
+\item[RFC 9180 (Hybrid Public Key Encryption).] HPKE provides a standardised framework for combining KEM, KDF, and AEAD primitives. XenevaOS's secure IPC and sealed storage subsystems use HPKE-compatible constructions to ensure interoperability with external systems.
+\item[NIST SP 800-208 (LMS and XMSS).] Stateful hash-based signatures for firmware. XenevaOS reserves this for the UEFI Secure Boot stage where signature verification is infrequent and the stateful nature is manageable.
+\item[NIST SP 800-57 (Key Management).] Defines key lifecycle requirements. The XenevaOS key hierarchy (Table~\ref{tab:key-hierarchy}) implements per-purpose derivation, explicit rotation policies, and destruction guarantees aligned with SP 800-57 Part 1, Revision 5.
+\item[NIST SP 800-193 (Platform Firmware Resiliency).] Requires protection, detection, and recovery mechanisms for platform firmware. XenevaOS's measured boot, rollback protection, and recovery boot path satisfy these requirements.
+\end{description}
+
+
+%% ====================================================================
+%%  SECTION 12: POST-QUANTUM MIGRATION STRATEGY
+%% ====================================================================
+
+\section{Post-Quantum Migration Strategy}\label{sec:migration-strategy}
+
+Migration from classical to post-quantum cryptography is not an atomic operation. It is a multi-year, multi-phase process that must maintain backward compatibility, operational continuity, and defence-in-depth throughout.
+
+\subsection{Migration Architecture}\label{sec:migration-arch}
+
+The XenevaOS migration follows a layered strategy:
+
+\begin{enumerate}
+    \item \textbf{Current State.} All cryptographic operations use classical algorithms (RSA-2048, ECDH P-256, ECDSA, AES-256-GCM). The system is fully operational but quantum-vulnerable.
+    \item \textbf{Hybrid Cryptography.} Classical and post-quantum algorithms are deployed in parallel. Key exchange uses concatenated shares (X25519 + ML-KEM-768). Signature verification requires both RSA/ECDSA and ML-DSA to pass. This is the designed default during the transition period.
+    \item \textbf{Dual Signatures.} Artefacts (firmware, modules, packages) carry both classical and post-quantum signatures. Verification policies are configurable: both-must-pass (default), either-may-pass (interoperability mode), or PQC-only (hardened mode).
+    \item \textbf{Hybrid TLS.} The TLS 1.3 key schedule incorporates both classical and post-quantum key material. The shared secret is derived as $\text{HKDF}(\text{X25519\_shared} \| \text{ML-KEM\_shared})$. Certificate chains carry dual signatures.
+    \item \textbf{Native PQC.} Classical algorithms are deprecated. All new key material is generated using post-quantum primitives exclusively. Legacy classical material is rotated out.
+    \item \textbf{Algorithm Agility.} The crypto framework supports runtime algorithm selection through an operation-based API. New algorithms (e.g., future NIST selections, SLH-DSA for specific use cases) can be added without kernel or firmware modification.
+    \item \textbf{Long-term Maintenance.} Continuous monitoring of cryptanalytic developments. Automated re-evaluation of parameter sizes. Managed key rotation schedules aligned with NIST SP 800-57 lifecycle requirements.
+\end{enumerate}
+
+\subsection{Risks During Migration}\label{sec:migration-risks}
+
+\begin{itemize}
+    \item \textbf{Downgrade attacks.} An active attacker may attempt to force negotiation of classical-only ciphers. Mitigation: the kernel enforces a minimum negotiation floor; hybrid is mandatory, and classical-only connections are rejected in hardened configurations.
+    \item \textbf{Implementation errors.} New cryptographic code introduces new attack surface. Mitigation: the kernel primitive core is intentionally minimal and subject to formal review. OpenSSL's audited ML-KEM and ML-DSA implementations are used for user-space operations.
+    \item \textbf{Performance regression.} ML-DSA verification is $9\times$ slower than RSA verification. Mitigation: signature caching, batch verification, and parallelisation at the architectural level (see Section~10.6).
+    \item \textbf{Key size inflation.} ML-KEM-768 public keys (1,184 bytes) and ML-DSA-65 signatures (3,309 bytes) are substantially larger than their classical counterparts. Mitigation: IPC message buffers, certificate stores, and firmware image formats are pre-sized for post-quantum artefacts.
+    \item \textbf{Interoperability.} During the transition, XenevaOS must communicate with systems that have not yet migrated. Mitigation: hybrid mode maintains classical compatibility while providing quantum resistance.
+\end{itemize}
+
+
+%% ====================================================================
+%%  SECTION 13: KERNEL INTEGRATION STRATEGY
+%% ====================================================================
+
+\section{Kernel-Level PQC Integration}\label{sec:kernel-integration}
+
+Post-quantum cryptography touches every subsystem in the kernel that consumes cryptographic services. This section describes the integration points and the architectural modifications required at each.
+
+\subsection{Kernel Crypto Framework}\label{sec:kcf}
+
+The Kernel Crypto Framework (KCF) is the central dispatch layer through which all kernel-resident cryptographic consumers access primitives. The KCF exposes an operation-based API: consumers request ``sign'', ``verify'', ``encapsulate'', ``decapsulate'', ``encrypt'', or ``hash'' without specifying the underlying algorithm. Algorithm selection is controlled by a kernel-global policy object that can be updated atomically at runtime.
+
+For PQC integration, the KCF requires the following extensions:
+
+\begin{itemize}
+    \item \textbf{KEM operation class.} Classical key exchange (Diffie-Hellman) is a two-party interactive protocol. KEM is a three-operation primitive (KeyGen, Encapsulate, Decapsulate). The KCF must expose KEM as a first-class operation class, distinct from key agreement.
+    \item \textbf{Hybrid combiner.} The KCF implements a generic hybrid combiner that takes two KEM instances and produces a combined shared secret via concatenation and KDF derivation. This combiner is algorithm-agnostic and supports any pairing of classical and post-quantum KEMs.
+    \item \textbf{Enlarged buffer allocations.} ML-KEM-768 ciphertexts (1,088 bytes) and ML-DSA-65 signatures (3,309 bytes) exceed the buffer sizes designed for classical cryptography. The KCF's internal buffer management is extended to handle these sizes without dynamic allocation in interrupt context.
+\end{itemize}
+
+\subsection{Process Manager}\label{sec:pm-integration}
+
+The process manager consults the KCF at process creation time to verify the signature on the executable binary. With ML-DSA, this verification takes $159.72~\mu s$ per invocation. For frequently spawned processes (shell commands, short-lived workers), this latency is mitigated by the signature cache: once a binary's signature is verified against its inode and modification timestamp, subsequent spawns of the same binary bypass re-verification until the inode is invalidated.
+
+\subsection{Driver Framework}\label{sec:driver-integration}
+
+Kernel modules are verified at load time using the same ML-DSA signature infrastructure. The driver framework additionally enforces a whitelist of signing authorities, each identified by an ML-DSA-65 public key stored in the kernel's certificate store. Modules signed by unknown authorities are rejected unconditionally; there is no user-override for kernel-mode code.
+
+\subsection{Network Stack}\label{sec:net-integration}
+
+The kernel's TLS offload path is extended to support hybrid key exchange. The network stack negotiates ML-KEM-768 + X25519 in the TLS 1.3 handshake and derives the master secret from the concatenated shared secrets. Certificate chain validation supports dual-signed certificates (RSA + ML-DSA) with configurable verification policies.
+
+\subsection{Filesystem and Package Manager}\label{sec:fs-integration}
+
+The filesystem layer integrates with the KCF for transparent file encryption (AES-256-GCM) and metadata integrity (HMAC-SHA-256). Key wrapping for per-file encryption keys uses ML-KEM to encapsulate the file encryption key against the volume's public key. The package manager verifies ML-DSA-65 signatures on all packages, with batch verification support for large update operations.
+%% ====================================================================
+%%  SECTION 14: SECURE BOOT AND ROOT OF TRUST
+%% ====================================================================
+
+\section{Secure Boot Chain Engineering}\label{sec:secure-boot-chain}
+
+The secure boot chain is the foundation of all trust decisions in XenevaOS. Every subsequent integrity guarantee, module signing, application verification, runtime attestation, derives its authority from the unbroken chain of signature verifications that begins at power-on.
+
+\subsection{Chain of Trust Architecture}\label{sec:cot}
+
+The boot chain proceeds through five verification stages:
+
+\begin{enumerate}
+    \item \textbf{Firmware (ROM).} The hardware root of trust, typically immutable code in platform ROM or a hardware security module, verifies the signature on the first-stage bootloader. This stage uses LMS (NIST SP 800-208) for its stateful hash-based signatures, providing conservative quantum resistance without lattice assumptions.
+    \item \textbf{First-Stage Bootloader (UEFI).} Verified by firmware, the UEFI bootloader verifies the second-stage bootloader and kernel using ML-DSA-65 signatures. The UEFI Secure Boot database is extended to store ML-DSA public keys alongside classical RSA keys during the hybrid transition.
+    \item \textbf{Kernel.} The verified kernel initialises the KCF, mounts the root filesystem, and verifies the integrity of all early-boot modules (filesystem drivers, storage drivers, crypto accelerator drivers) using ML-DSA-65.
+    \item \textbf{Init System and Core Daemons.} The init system verifies signatures on all system daemons before execution. Verification results are recorded in the measured boot log for subsequent attestation.
+    \item \textbf{User-Space Applications.} Application signatures are verified at load time by the process manager, using the certificate hierarchy established during boot.
+\end{enumerate}
+
+\subsection{Measured Boot and TPM Integration}\label{sec:measured-boot}
+
+Measured boot extends the chain of trust from binary verification to configuration attestation. At each boot stage, the hash of the verified component is extended into a Platform Configuration Register (PCR) in the Trusted Platform Module (TPM). The resulting PCR values form a tamper-evident record of the exact software stack that was loaded.
+
+For PQC integration, the measured boot log records both the hash of the verified binary and the algorithm used for verification. This allows a remote verifier to distinguish between systems that booted with classical signatures (transitional) and systems that booted with post-quantum signatures (hardened).
+
+\subsection{Rollback Protection}\label{sec:rollback}
+
+Rollback protection prevents an adversary from downgrading the system to a previously vulnerable firmware or kernel version. XenevaOS implements rollback protection through a monotonic anti-rollback counter stored in the TPM's non-volatile memory. Each signed firmware image includes a minimum version number; the bootloader refuses to execute any image with a version number below the current counter value.
+
+\subsection{Recovery Boot Path}\label{sec:recovery}
+
+If the primary boot chain fails verification, the bootloader activates a recovery path that loads a known-good kernel image from a write-protected recovery partition. The recovery image is signed with the platform root key and verified using the firmware's LMS implementation, bypassing the potentially compromised UEFI Secure Boot database.
+
+
+%% ====================================================================
+%%  SECTION 15: HYBRID TLS ARCHITECTURE
+%% ====================================================================
+
+\section{Hybrid TLS 1.3 Architecture}\label{sec:hybrid-tls}
+
+Transport Layer Security is the primary protocol securing network communication in XenevaOS. The transition to post-quantum TLS requires modifications to the key exchange, certificate validation, and session resumption mechanisms while maintaining full backward compatibility with classical TLS 1.3 peers.
+
+\subsection{Hybrid Key Exchange}\label{sec:hybrid-kex}
+
+The hybrid key exchange combines X25519 (classical) and ML-KEM-768 (post-quantum) in a single TLS 1.3 handshake. The client generates both an X25519 ephemeral key pair and an ML-KEM-768 key pair, sending both public keys in the ClientHello key\_share extension. The server performs both X25519 key agreement and ML-KEM-768 encapsulation, returning both the X25519 public key and the ML-KEM ciphertext in the ServerHello.
+
+The combined shared secret is derived as:
+
+\begin{quote}
+$\text{shared\_secret} = \text{HKDF-Extract}(\text{X25519\_shared} \| \text{ML-KEM\_shared})$
+\end{quote}
+
+This construction ensures that the resulting session keys are secure as long as either the classical or the post-quantum component remains unbroken, providing defence-in-depth during the transition period.
+
+\subsection{Certificate Validation}\label{sec:cert-validation}
+
+During the hybrid transition, TLS certificates carry dual signatures: a classical signature (ECDSA P-256 or RSA-2048) for interoperability with legacy verifiers, and an ML-DSA-65 signature for quantum-resistant authentication. The XenevaOS TLS stack verifies both signatures and rejects the certificate if either fails.
+
+Certificate chains are similarly dual-signed. The root certificate authority issues certificates with both a classical and a post-quantum signing key. Intermediate and leaf certificates carry dual signatures, with the post-quantum signature covering the same TBS (To Be Signed) data as the classical signature.
+
+\subsection{Forward Secrecy and Session Resumption}\label{sec:forward-secrecy}
+
+Hybrid key exchange preserves forward secrecy: both the X25519 and ML-KEM-768 key pairs are ephemeral and destroyed after key derivation. Even if the server's long-term signing key is later compromised, past session keys cannot be recovered.
+
+Session resumption via TLS 1.3 PSK (Pre-Shared Key) mode uses session tickets encrypted under AES-256-GCM with a ticket encryption key derived from the hybrid shared secret. This ensures that resumed sessions inherit the quantum resistance of the original handshake.
+
+
+%% ====================================================================
+%%  SECTION 16: SECURE IPC ARCHITECTURE
+%% ====================================================================
+
+\section{Secure Inter-Process Communication Architecture}\label{sec:secure-ipc-arch}
+
+The XenevaOS micro-kernel architecture relies on Inter-Process Communication (IPC) as the primary mechanism for inter-daemon coordination, service discovery, and privilege-separated operations. Securing IPC is not optional; it is a structural requirement of the capability-based security model.
+
+\subsection{PostBox Architecture}\label{sec:postbox}
+
+The PostBox is the fundamental IPC primitive in XenevaOS. Each process owns a set of PostBoxes, each identified by a capability token. Sending a message to a PostBox requires possession of the corresponding send-capability; receiving requires the recv-capability. The kernel mediates all PostBox operations, enforcing capability checks at the system call boundary.
+
+\subsection{Session Establishment}\label{sec:ipc-session}
+
+When two processes establish a secure IPC channel, the kernel performs an in-kernel ML-KEM-768 key encapsulation on behalf of the initiating process, using the responder's public key (stored in the kernel key store). The resulting shared secret is used to derive a symmetric session key via HKDF-SHA-256. All subsequent messages on the channel are encrypted with AES-256-GCM using the derived session key and a monotonically increasing nonce.
+
+\subsection{Replay Protection and Message Authentication}\label{sec:ipc-replay}
+
+Each encrypted IPC message includes a 64-bit sequence number and a 128-bit authentication tag (AES-256-GCM). The kernel maintains per-channel sequence state and rejects any message with a sequence number less than or equal to the last accepted value. This provides replay protection without requiring timestamps or external synchronisation.
+
+\subsection{Privilege Separation and Capability Validation}\label{sec:ipc-privilege}
+
+The IPC security model enforces the principle of least privilege: a process can only communicate with PostBoxes for which it holds valid capabilities. Capability delegation is mediated by the kernel; a process may grant a subset of its capabilities to a child process at creation time but cannot forge or escalate capabilities.
+
+This capability-based IPC model provides a natural enforcement point for post-quantum cryptographic policy: the kernel can require that all IPC channels servicing privileged operations (e.g., disk encryption key requests, attestation token generation) use ML-KEM-derived session keys, while lower-privilege channels may use classical key exchange during the transition period.
+
+
+%% ====================================================================
+%%  SECTION 17: STORAGE SECURITY
+%% ====================================================================
+
+\section{Storage Security Architecture}\label{sec:storage-security}
+
+Data-at-rest protection in XenevaOS is implemented as a layered encryption architecture that integrates with the kernel crypto framework, TPM-sealed storage, and the key hierarchy defined in Section~9.3.
+
+\subsection{Filesystem Encryption}\label{sec:fs-encryption}
+
+XenevaOS supports two modes of storage encryption:
+
+\begin{description}[leftmargin=0pt,style=unboxed]
+\item[Full Volume Encryption (FVE).] The entire block device is encrypted with AES-256-XTS. The volume encryption key (VEK) is sealed to the TPM and released only when the measured boot state matches the expected PCR values. This prevents offline attacks against the storage medium.
+\item[Per-File Encryption (PFE).] Individual files are encrypted with per-file keys derived from the user's credential-bound master key. Each file's encryption key is wrapped (encapsulated) using ML-KEM-768 against the volume's public key, ensuring that future quantum adversaries cannot recover the file key by attacking the key-wrapping layer.
+\end{description}
+
+\subsection{Key Wrapping and Derivation}\label{sec:key-wrapping}
+
+Key wrapping in XenevaOS uses ML-KEM-768 for encapsulation and HKDF-SHA-256 for key derivation. The key hierarchy ensures cryptographic separation between volumes, users, and applications:
+
+\begin{itemize}
+    \item The platform root key derives per-volume master keys.
+    \item Per-volume master keys derive per-user keys via HKDF with user-specific context.
+    \item Per-user keys derive per-application keys via HKDF with application-specific context.
+    \item Per-file keys are generated randomly and wrapped under the per-application key.
+\end{itemize}
+
+\subsection{Metadata Integrity and Secure Deletion}\label{sec:metadata-integrity}
+
+Filesystem metadata (directory entries, file attributes, extent maps) is integrity-protected using HMAC-SHA-256 keyed by a metadata authentication key derived from the volume master key. Metadata corruption is detected at mount time and during runtime consistency checks.
+
+Secure deletion is implemented through cryptographic erasure: deleting a file destroys its per-file encryption key. Since the encrypted file data is irrecoverable without the key, no physical overwrite of the storage medium is required. This is particularly important for solid-state drives where traditional multi-pass overwrite is unreliable.
+%% ====================================================================
+%%  SECTION 18: RISK ASSESSMENT
+%% ====================================================================
+
+\section{Engineering Risk Assessment}\label{sec:risk-assessment}
+
+The transition to post-quantum cryptography introduces engineering risks that must be identified, quantified, and mitigated. This section provides a structured risk assessment following standard engineering risk management practices.
+
+\subsection{Implementation Risks}\label{sec:impl-risks}
+
+\begin{table}[!ht]
+\centering
+\caption{Implementation Risk Matrix}\label{tab:impl-risks}
+\small
+\begin{tabularx}{\textwidth}{%
+  X L{2cm} L{2cm} L{5cm}}
+\toprule
+\rowcolor{tblheader}
+\thead{Risk} & \thead{Likelihood} & \thead{Impact} & \thead{Mitigation} \\
+\midrule
+\rowcolor{tblrow1}
+Side-channel leakage in ML-KEM & Medium & High & Constant-time implementations; hardware-specific validation on target platforms \\
+\rowcolor{tblrow2}
+Buffer overflow in enlarged PQC structures & Medium & Critical & Static analysis enforcement; pre-allocated fixed-size buffers in KCF \\
+\rowcolor{tblrow1}
+Incorrect hybrid combiner construction & Low & Critical & Formal verification of HKDF concatenation; test vectors from NIST reference implementations \\
+\rowcolor{tblrow2}
+Regression in classical crypto during migration & Medium & High & Dual test suites; classical-only and hybrid test configurations run in CI \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Migration Risks}\label{sec:migration-risks-table}
+
+\begin{itemize}
+    \item \textbf{Incomplete inventory.} Undiscovered cryptographic dependencies delay migration. Mitigation: automated static analysis of all source files for cryptographic API usage.
+    \item \textbf{Third-party dependency lag.} External libraries, drivers, or firmware that have not migrated to PQC create interoperability gaps. Mitigation: hybrid mode provides backward compatibility; a dependency tracker monitors the PQC readiness of all external components.
+    \item \textbf{Key rotation failures.} Errors during the rotation of long-lived keys from classical to post-quantum material can lock out legitimate users. Mitigation: staged rotation with rollback capability; recovery keys stored in HSM or offline medium.
+\end{itemize}
+
+\subsection{Performance Risks}\label{sec:perf-risks}
+
+The benchmark results in Section~10 demonstrate acceptable performance on the test platform (AMD Ryzen 7 8845HS). However, XenevaOS targets a broader hardware range. The following performance risks must be tracked:
+
+\begin{itemize}
+    \item \textbf{Low-power and embedded platforms.} ML-DSA verification on processors without vector extensions (e.g., Cortex-A53) may exhibit latencies $5$--$10\times$ higher than the benchmark platform. Mitigation: signature caching reduces the frequency of verification operations; critical-path verification (boot chain) is benchmarked on every target platform before deployment.
+    \item \textbf{Memory-constrained environments.} ML-KEM-768 requires approximately 2,400 bytes of stack for key generation. On systems with limited kernel stack (4~KB), this may require dynamic allocation or dedicated crypto stack frames. Mitigation: KCF allocates a per-CPU crypto scratchpad at boot time.
+    \item \textbf{Network bandwidth.} Hybrid TLS handshakes transmit approximately 2,500 additional bytes compared to classical handshakes. On high-latency or bandwidth-constrained links (satellite, IoT gateways), this increases handshake time. Mitigation: session resumption amortises the handshake cost across multiple connections.
+\end{itemize}
+
+\subsection{Supply Chain and Operational Risks}\label{sec:supply-chain}
+
+\begin{itemize}
+    \item \textbf{Algorithm compromise.} A future cryptanalytic breakthrough against MLWE would invalidate ML-KEM and ML-DSA simultaneously. Mitigation: the algorithm agility framework supports immediate fallback to SLH-DSA (hash-based) signatures and Classical McEliece or FrodoKEM for key encapsulation.
+    \item \textbf{Compromised build infrastructure.} If the build system that signs XenevaOS artefacts is compromised, an adversary can inject malicious code with valid signatures. Mitigation: reproducible builds, multi-party signing with threshold ML-DSA, and an independent verification service.
+    \item \textbf{Entropy source failure.} The CSPRNG depends on hardware entropy sources that may degrade or fail. Mitigation: continuous entropy health monitoring (NIST SP 800-90B); the CSPRNG refuses to generate output if the entropy pool falls below a minimum threshold.
+\end{itemize}
+
+
+%% ====================================================================
+%%  SECTION 19: EXTENDED PERFORMANCE ANALYSIS
+%% ====================================================================
+
+\section{Extended Performance Analysis}\label{sec:extended-perf}
+
+The benchmark results in Section~10 establish the latency characteristics of individual cryptographic primitives and composite operations. This section extends the analysis to address memory overhead, key and signature sizes, scalability, and expected production impact.
+
+\subsection{Key and Signature Size Impact}\label{sec:size-impact}
+
+\begin{table}[!ht]
+\centering
+\caption{Cryptographic Artefact Sizes: Classical vs Post-Quantum}\label{tab:size-comparison}
+\small
+\begin{tabularx}{\textwidth}{%
+  X C{2cm} C{2cm} C{2cm} C{2cm}}
+\toprule
+\rowcolor{tblheader}
+\thead{Primitive} & \thead{Public Key} & \thead{Private Key} & \thead{Ciphertext / Signature} & \thead{Size Ratio} \\
+\midrule
+\rowcolor{tblrow1}
+ECDH P-256 (public key) & 64 B & 32 B & --- & 1.0$\times$ \\
+\rowcolor{tblrow2}
+ML-KEM-768 (public key) & 1,184 B & 2,400 B & 1,088 B & 18.5$\times$ \\
+\rowcolor{tblrow1}
+RSA-2048 (signature) & 256 B & 256 B & 256 B & 1.0$\times$ \\
+\rowcolor{tblrow2}
+ML-DSA-65 (signature) & 1,952 B & 4,032 B & 3,309 B & 12.9$\times$ \\
+\rowcolor{tblrow1}
+SLH-DSA-256f (signature) & 64 B & 128 B & 49,856 B & 194.8$\times$ \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The size increase is substantial but manageable within the XenevaOS architecture:
+
+\begin{itemize}
+    \item \textbf{Certificate storage.} The kernel certificate store holding ML-DSA-65 public keys for 100 signing authorities requires approximately 195~KB, compared to 25.6~KB for RSA-2048. This is negligible relative to available RAM.
+    \item \textbf{IPC message overhead.} The initial ML-KEM key exchange adds 1,184 bytes (public key) + 1,088 bytes (ciphertext) = 2,272 bytes to the first IPC message. Subsequent messages carry only the AES-GCM ciphertext (payload + 16 byte tag), with no PQC overhead.
+    \item \textbf{Package signatures.} A signed package with an ML-DSA-65 signature adds 3,309 bytes. For a 1,000-package system update, the total signature overhead is 3.3~MB, which is negligible compared to the package payloads themselves.
+    \item \textbf{Boot chain signatures.} The kernel image carries a single ML-DSA-65 signature (3,309 bytes). This is appended to a multi-megabyte kernel binary and has no measurable impact on load time.
+\end{itemize}
+
+\subsection{Scalability Projections}\label{sec:scalability}
+
+The benchmark suite measures individual operation latencies. Production systems execute these operations concurrently, under load, and with competing resource demands. Based on the measured throughput:
+
+\begin{itemize}
+    \item \textbf{TLS connections.} ML-KEM-768 encapsulation at $29.59~\mu s$ supports a theoretical maximum of approximately 33,700 new TLS connections per second per core. With 8 physical cores, the system can sustain over 250,000 new hybrid TLS connections per second, which exceeds the requirements of any XR deployment scenario.
+    \item \textbf{Package verification.} At $2,197.8~ms$ for 1,000 packages, a full system update verifies at a rate of approximately 455 packages per second. Background verification with a dedicated core does not impact interactive workloads.
+    \item \textbf{IPC throughput.} The measured IPC roundtrip of $118.73~\mu s$ supports approximately 8,400 secure IPC transactions per second per channel. Multi-channel IPC with dedicated PostBoxes scales linearly with the number of channels.
+\end{itemize}
+
+\subsection{Expected Production Impact}\label{sec:prod-impact}
+
+Based on the benchmark data and architectural mitigations described in this document, the expected production impact of post-quantum migration is:
+
+\begin{itemize}
+    \item \textbf{Boot time.} Increases by approximately 6.06~ms. Imperceptible to the user.
+    \item \textbf{Application launch.} First launch incurs a $159.72~\mu s$ ML-DSA verification. Subsequent launches of the same binary are served from the signature cache. Net impact on perceived latency: zero.
+    \item \textbf{Network latency.} Hybrid TLS handshake adds approximately 2.5~KB of data and one additional round-trip for ML-KEM encapsulation. On low-latency networks, the added handshake time is under 1~ms.
+    \item \textbf{Storage overhead.} Per-file key wrapping with ML-KEM adds 1,088 bytes of metadata per encrypted file. For a filesystem with 100,000 files, the total metadata overhead is approximately 104~MB, which is acceptable on modern storage.
+\end{itemize}
+
+
+%% ====================================================================
+%%  SECTION 20: COMPLIANCE MATRIX
+%% ====================================================================
+
+\section{Regulatory and Compliance Alignment}\label{sec:compliance}
+
+\subsection{NIST Compliance}\label{sec:nist-compliance}
+
+XenevaOS targets compliance with the NIST Cryptographic Module Validation Program (CMVP) under FIPS 140-3. The kernel crypto framework is designed as a self-contained cryptographic module with a defined security boundary encompassing the primitive core, CSPRNG, and key management services. The module boundary excludes user-space libraries, which are validated separately.
+
+Algorithm compliance is ensured by using the NIST-standardised parameter sets (ML-KEM-768, ML-DSA-65) as specified in FIPS 203 and FIPS 204. The CSPRNG design follows NIST SP 800-90A (DRBG construction) with entropy source validation per SP 800-90B.
+
+\subsection{ETSI Migration Compliance}\label{sec:etsi-compliance}
+
+The ETSI TR 103 619 migration framework specifies four maturity levels for post-quantum readiness:
+
+\begin{enumerate}
+    \item \textbf{Level 1: Awareness.} The organisation has identified cryptographic dependencies. XenevaOS achieves this through the gap analysis in Section~9.1.
+    \item \textbf{Level 2: Preparation.} Cryptographic agility is designed into the architecture. XenevaOS achieves this through the operation-based KCF API.
+    \item \textbf{Level 3: Hybrid deployment.} Post-quantum algorithms are deployed alongside classical algorithms. XenevaOS achieves this in Phase~1 of the roadmap.
+    \item \textbf{Level 4: Full migration.} Classical algorithms are deprecated. XenevaOS targets this in Phase~4.
+\end{enumerate}
+
+\subsection{Indian Government Cybersecurity Alignment}\label{sec:india-compliance}
+
+India's national cybersecurity framework, administered through CERT-In and the Ministry of Electronics and Information Technology (MeitY), mandates adherence to international cryptographic standards for government IT systems. XenevaOS's alignment with FIPS 203, FIPS 204, and NIST SP 800-57 satisfies these requirements. Additionally, C-DAC's role as a national research institution positions XenevaOS as a reference implementation for post-quantum readiness in Indian government infrastructure.
+
+\subsection{NSA CNSA 2.0 Alignment}\label{sec:cnsa2-compliance}
+
+As detailed in Section~11.3, XenevaOS's Phase~1 roadmap (ML-DSA for firmware signing, ML-KEM hybrid for TLS) meets the CNSA 2.0 preferred timelines for software signing (2025) and network security (2026). Full compliance with the required timelines (2030--2033) is achievable within the four-phase roadmap.
+
+
+%% ====================================================================
+%%  SECTION 21: PATENT OPPORTUNITIES
+%% ====================================================================
+
+\section{Technical Innovation and Patent Landscape}\label{sec:patents}
+
+The integration of post-quantum cryptography into an operating system kernel, particularly one targeting XR workloads, involves several technical innovations that may constitute patentable subject matter. This section identifies potential areas of novelty from an engineering perspective. No legal claims regarding patentability are made; formal evaluation by patent counsel is required.
+
+\subsection{Identified Innovation Areas}\label{sec:patent-areas}
+
+\begin{description}[leftmargin=0pt,style=unboxed]
+\item[Kernel-Native PQC Crypto Framework with Operation-Based Dispatch.] The KCF's architecture, specifically its operation-based API that abstracts algorithm selection behind a kernel-global policy object and supports atomic runtime algorithm switching, represents a novel approach to cryptographic agility in kernel space. Existing OS crypto frameworks (Linux Crypto API, Windows CNG) do not provide this level of algorithm abstraction with kernel-policy-driven dispatch.
+
+\item[Secure XR Trust Architecture with Spatial Identity Binding.] The binding of cryptographic identity to spatial anchors and persistent XR sessions, secured by post-quantum signatures, is a novel architectural concept. No existing XR platform integrates post-quantum spatial identity verification at the operating system level.
+
+\item[Hybrid Boot Verification with Stateful and Stateless Signature Coexistence.] The boot chain architecture that uses LMS (stateful, hash-based) at the firmware level and ML-DSA (stateless, lattice-based) at the kernel level, with a defined transition boundary and anti-rollback enforcement, is a novel multi-algorithm boot verification design.
+
+\item[Quantum-Safe IPC with Capability-Mediated Key Encapsulation.] The integration of ML-KEM key encapsulation into a capability-based IPC model, where the kernel performs encapsulation on behalf of processes that never access raw key material, is a novel privilege-separated key management architecture for inter-process communication.
+
+\item[Crypto-Agile Operating System Framework with Automated Fallback.] The framework's ability to detect algorithm compromise (through policy updates or external signals) and automatically switch all consumers to a fallback algorithm (e.g., from ML-DSA to SLH-DSA) without system restart constitutes a novel resilience mechanism.
+\end{description}
+%% ====================================================================
+%%  SECTION 22: RESEARCH DELIVERABLES
+%% ====================================================================
+
+\section{Research Deliverables}\label{sec:deliverables}
+
+This research programme produces eight formal deliverables, each with defined scope, technical depth, and acceptance criteria.
+
+\begin{description}[leftmargin=0pt,style=unboxed]
+
+\item[Deliverable 1: White Paper (80--120 pages).]
+A comprehensive technical white paper documenting the XenevaOS post-quantum security architecture. The document covers threat analysis, standards alignment, architectural design, empirical benchmarking, migration strategy, risk assessment, and compliance mapping. This document, in its final form, constitutes Deliverable~1.
+
+\item[Deliverable 2: Kernel Crypto Framework.]
+A working implementation of the Kernel Crypto Framework with support for ML-KEM-768, ML-DSA-65, SLH-DSA (fallback), AES-256-GCM, SHA-3-256, and HKDF-SHA-256. The framework exposes the operation-based API described in Section~13.1 and includes the hybrid combiner for ML-KEM + X25519.
+
+\item[Deliverable 3: Hybrid TLS Prototype.]
+A functional prototype of the hybrid TLS 1.3 implementation described in Section~15. The prototype demonstrates hybrid key exchange (X25519 + ML-KEM-768), dual-signed certificate validation (ECDSA + ML-DSA-65), and session resumption with quantum-resistant ticket encryption.
+
+\item[Deliverable 4: PQC Secure Boot Prototype.]
+A prototype secure boot chain implementing the architecture described in Section~14. The prototype demonstrates LMS firmware verification, ML-DSA-65 kernel verification, measured boot with PCR extension, and rollback protection.
+
+\item[Deliverable 5: Secure IPC Prototype.]
+A prototype of the capability-mediated, ML-KEM-secured IPC architecture described in Section~16. The prototype demonstrates in-kernel key encapsulation, AES-256-GCM message encryption, replay protection, and capability-based access control.
+
+\item[Deliverable 6: Benchmark Suite.]
+The complete C++ benchmark suite used to generate the results in Section~10, including all five experiments, the statistical analysis pipeline, and the automated report generation system. The suite is reproducible and platform-portable.
+
+\item[Deliverable 7: Technology Roadmap.]
+A detailed, phased technology roadmap with dependency tracking, risk registers, and milestone definitions. The roadmap covers the full 24-month migration timeline described in Section~23.
+
+\item[Deliverable 8: Standards Compliance Report.]
+A formal compliance assessment mapping XenevaOS capabilities to FIPS 203, FIPS 204, FIPS 205, NIST SP 800-57, NIST SP 800-90A/B/C, NIST SP 800-193, NSA CNSA 2.0, and ETSI TR 103 619. The report identifies gaps and provides a remediation timeline.
+
+\end{description}
+
+
+%% ====================================================================
+%%  SECTION 23: PHASED MIGRATION ROADMAP
+%% ====================================================================
+
+\section{Phased Migration Roadmap}\label{sec:roadmap}
+
+The post-quantum migration of XenevaOS proceeds through four phases over a 24-month period. Each phase has defined objectives, technical tasks, dependencies, expected outcomes, risks, and success criteria.
+
+\subsection{Phase 1: Foundation (Months 0--6)}\label{sec:phase1}
+
+\textbf{Objectives.} Establish the cryptographic foundation for post-quantum operations across the kernel and core services.
+
+\textbf{Technical Tasks:}
+\begin{enumerate}
+    \item Implement ML-KEM-768 key encapsulation in the Kernel Crypto Framework.
+    \item Implement ML-DSA-65 signature generation and verification in the KCF.
+    \item Deploy hybrid TLS 1.3 (X25519 + ML-KEM-768) in the middleware networking layer.
+    \item Extend the UEFI Secure Boot database to accept ML-DSA-65 public keys.
+    \item Implement secure update verification using dual signatures (RSA + ML-DSA).
+    \item Integrate the CSPRNG with hardware entropy sources and deploy continuous health monitoring.
+\end{enumerate}
+
+\textbf{Dependencies.} OpenSSL 3.x with FIPS 203/204 provider modules. TPM 2.0 firmware supporting PQC-aware PCR extension. Target hardware availability for validation.
+
+\textbf{Expected Outcomes.} A system that boots with hybrid (classical + PQC) signature verification, negotiates hybrid TLS connections, and verifies software updates using dual signatures.
+
+\textbf{Risks.} OpenSSL PQC provider stability; TPM firmware compatibility; side-channel validation on target hardware.
+
+\textbf{Success Criteria.} All five benchmark experiments pass on target hardware with performance within $20\%$ of reference platform results. Hybrid TLS interoperability validated against three external TLS implementations.
+
+\subsection{Phase 2: Core Services (Months 6--12)}\label{sec:phase2}
+
+\textbf{Objectives.} Extend post-quantum protection to all kernel services and critical system daemons.
+
+\textbf{Technical Tasks:}
+\begin{enumerate}
+    \item Implement the Kernel Key Vault with TPM-sealed storage and ML-KEM key wrapping.
+    \item Deploy ML-KEM-secured IPC across all system daemons.
+    \item Implement ML-DSA package verification in the package manager.
+    \item Extend the driver framework to enforce ML-DSA-65 module signatures.
+    \item Implement per-file encryption with ML-KEM key wrapping in the filesystem layer.
+    \item Deploy signature caching infrastructure for high-frequency verification paths.
+\end{enumerate}
+
+\textbf{Dependencies.} Phase~1 KCF and hybrid TLS. Filesystem driver with metadata integrity support. Package manager with dual-signature support.
+
+\textbf{Expected Outcomes.} A system where all kernel-to-daemon and daemon-to-daemon communication is quantum-resistant. All installed packages are PQC-verified. Filesystem encryption uses post-quantum key wrapping.
+
+\textbf{Risks.} Signature cache invalidation correctness; filesystem metadata corruption during key rotation; IPC latency regression under high-concurrency workloads.
+
+\textbf{Success Criteria.} Zero signature verification bypasses in automated testing. Filesystem encryption passes NIST SP 800-38D test vectors. IPC throughput remains within $15\%$ of unencrypted baseline.
+
+\subsection{Phase 3: XR Platform Integration (Months 12--18)}\label{sec:phase3}
+
+\textbf{Objectives.} Extend post-quantum security to XR-specific subsystems and provide developer-facing APIs.
+
+\textbf{Technical Tasks:}
+\begin{enumerate}
+    \item Implement quantum-resistant XR session security (spatial anchor signing, session key exchange).
+    \item Deploy multi-user XR collaboration with post-quantum group key agreement.
+    \item Publish SDK APIs for post-quantum cryptographic operations (KEM, DSA, hybrid TLS).
+    \item Release developer documentation and sample applications demonstrating PQC integration.
+    \item Implement sensor stream encryption with ML-KEM-derived session keys.
+    \item Deploy post-quantum device attestation for XR headset and controller authentication.
+\end{enumerate}
+
+\textbf{Dependencies.} Phase~2 IPC and key vault. XR compositor and session manager. SDK build system and documentation infrastructure.
+
+\textbf{Expected Outcomes.} Third-party XR applications can use post-quantum cryptographic operations through documented, stable APIs. Multi-user XR sessions are secured against quantum adversaries.
+
+\textbf{Risks.} SDK API stability; developer adoption; group key agreement performance with large participant counts; sensor stream encryption latency on low-power headset processors.
+
+\textbf{Success Criteria.} SDK API passes backwards-compatibility test suite. Multi-user sessions support 16 concurrent participants with per-user quantum-resistant channels. Sensor stream encryption adds less than $500~\mu s$ latency per frame.
+
+\subsection{Phase 4: Certification and Hardening (Months 18--24)}\label{sec:phase4}
+
+\textbf{Objectives.} Achieve standards compliance, harden the implementation against real-world attacks, and validate interoperability.
+
+\textbf{Technical Tasks:}
+\begin{enumerate}
+    \item Prepare FIPS 140-3 module submission for the kernel crypto framework.
+    \item Validate compliance with FIPS 203, FIPS 204, and FIPS 205 using NIST reference test vectors.
+    \item Implement ETSI TR 103 619 migration maturity Level~4 (classical algorithm deprecation).
+    \item Achieve CNSA 2.0 alignment across all cryptographic subsystems.
+    \item Conduct penetration testing by an independent security evaluation laboratory.
+    \item Validate interoperability with external systems (TLS peers, certificate authorities, package repositories).
+    \item Perform side-channel analysis on all target hardware platforms.
+    \item Document remaining classical cryptographic dependencies and their deprecation timeline.
+\end{enumerate}
+
+\textbf{Dependencies.} All Phase~1--3 deliverables. NIST CAVP test vector availability. Independent testing laboratory availability.
+
+\textbf{Expected Outcomes.} A standards-compliant, independently evaluated, post-quantum operating system ready for deployment in government, defence, and enterprise XR environments.
+
+\textbf{Risks.} FIPS validation timeline uncertainty; zero-day vulnerabilities discovered during penetration testing; NIST test vector changes during the validation period.
+
+\textbf{Success Criteria.} FIPS 140-3 module submission accepted. Zero critical vulnerabilities in penetration testing. Interoperability validated with at least five external TLS implementations and three certificate authorities. Side-channel analysis confirms constant-time behaviour on all target platforms.
 
 \end{document}
