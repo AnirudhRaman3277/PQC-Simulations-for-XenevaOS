@@ -30,10 +30,10 @@ To ensure the proposed algorithms meet the strict performance and stability requ
 
 \textbf{Hardware and Software Test Environment:}
 \begin{itemize}
-    \item \textbf{CPU Architecture:} AMD Ryzen 7 5800H (Zen 3 architecture, highly optimized for cryptographic vector extensions)
+    \item \textbf{CPU Architecture:} AMD Ryzen 7 5800H (Zen 3 architecture, highly optimized for cryptographic vector extensions). CPU Turbo Mode was explicitly disabled to prevent frequency scaling and ensure strictly consistent latency measurements.
     \item \textbf{System Memory (RAM):} 7.4 GiB allocated
     \item \textbf{Operating System Kernel:} Linux 6.18.33.2-microsoft-standard-WSL2 (approximating XenevaOS underlying abstractions)
-    \item \textbf{Compiler Toolchain:} GNU C++ Compiler (g++) version 15.2.0 (Ubuntu) with standard optimization flags enabled.
+    \item \textbf{Compiler Toolchain:} Clang C++ Compiler version 16.1.x with standard optimization flags enabled.
 \end{itemize}
 
 To guarantee statistical significance and eliminate systematic noise from CPU frequency scaling or cold caches, each simulation consisted of a rigorous warmup phase (minimum 100 iterations) followed by thousands of measured execution loops. This allowed us to calculate highly reliable mean latencies, variances, and operational throughput metrics.
