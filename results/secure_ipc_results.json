@@ -1,0 +1,62 @@
+{
+  "experiment": "Experiment 5: Secure IPC Simulation (ECDH+AES vs ML-KEM+AES)",
+  "system": {
+    "compiler": "GNU",
+    "compiler_version": "g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+    "optimization_flags": " -march=native -fomit-frame-pointer ",
+    "openssl": "OpenSSL 3.5.5 27 Jan 2026",
+    "cpu_vendor": "AuthenticAMD",
+    "cpu_model": "AMD Ryzen 7 5800H with Radeon Graphics",
+    "cpu_arch": "x86_64",
+    "logical_cores": "16",
+    "physical_cores": "8",
+    "os_name": "Linux",
+    "kernel": "6.18.33.2-microsoft-standard-WSL2",
+    "ram": "7.4Gi",
+    "timestamp": "2026-07-19 09:22:02 UTC"
+  },
+  "results": [
+    {
+      "algorithm": "Classical (ECDH+AES)",
+      "compiler": "GNU",
+      "compiler_version": "g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+      "optimization_flags": " -march=native -fomit-frame-pointer ",
+      "cpu_model": "AMD Ryzen 7 5800H with Radeon Graphics",
+      "operating_system": "Linux",
+      "timestamp": "2026-07-19 09:22:02 UTC",
+      "operation": "IPC Roundtrip",
+      "iterations": 5000,
+      "average": 177.2730,
+      "median": 153.0760,
+      "minimum": 146.8090,
+      "maximum": 3325.7420,
+      "variance": 6195.4424,
+      "standard_deviation": 78.7111,
+      "ci95_us": 2.1818,
+      "ops_per_sec": 5641.02,
+      "relative_slowdown": 1.0000,
+      "overhead_pct": 0.0000
+    },
+    {
+      "algorithm": "PQ (ML-KEM+AES)",
+      "compiler": "GNU",
+      "compiler_version": "g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+      "optimization_flags": " -march=native -fomit-frame-pointer ",
+      "cpu_model": "AMD Ryzen 7 5800H with Radeon Graphics",
+      "operating_system": "Linux",
+      "timestamp": "2026-07-19 09:22:02 UTC",
+      "operation": "IPC Roundtrip",
+      "iterations": 5000,
+      "average": 154.0346,
+      "median": 137.3110,
+      "minimum": 136.0480,
+      "maximum": 4331.2170,
+      "variance": 9653.3951,
+      "standard_deviation": 98.2517,
+      "ci95_us": 2.7234,
+      "ops_per_sec": 6492.05,
+      "relative_slowdown": 0.8689,
+      "overhead_pct": -13.1088
+    }
+  ]
+}

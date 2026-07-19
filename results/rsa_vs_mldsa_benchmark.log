@@ -1,0 +1,115 @@
+========================================
+ Benchmark Log
+ Experiment 2: RSA-2048 vs ML-DSA-65 — Digital Signatures
+========================================
+
+System Information
+  Compiler     : GNU g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0
+  Opt. Flags   :  -march=native -fomit-frame-pointer 
+  OpenSSL      : OpenSSL 3.5.5 27 Jan 2026
+  CPU          : AuthenticAMD AMD Ryzen 7 5800H with Radeon Graphics
+  CPU Arch     : x86_64
+  Cores        : 8 Physical / 16 Logical
+  OS & Kernel  : Linux 6.18.33.2-microsoft-standard-WSL2
+  RAM          : 7.4Gi
+  Time         : 2026-07-19 09:20:31 UTC
+  Duration     : 11.49 seconds
+
+----------------------------------------
+ Key & Signature Sizes (DER-encoded)
+----------------------------------------
+
+  [RSA-2048]
+    Public Key  : 294 bytes
+    Private Key : 1190 bytes
+    Signature   : 256 bytes
+
+  [ML-DSA-65]
+    Public Key  : 1974 bytes
+    Private Key : 4098 bytes
+    Signature   : 3309 bytes
+
+  Size Ratios (ML-DSA-65 / RSA-2048):
+    Public Key  : 6.71x
+    Private Key : 3.44x
+    Signature   : 12.93x
+
+----------------------------------------
+ Timing Results
+----------------------------------------
+
+  [RSA-2048] Key Generation
+    Iterations     : 100
+    Mean           : 53605.3683 us
+    Median         : 45354.3895 us
+    Minimum        : 13237.1550 us
+    Maximum        : 258375.7280 us
+    Std Dev        : 36766.0592 us
+    95% CI         : ±7206.1476 us
+    Ops/sec        : 18.65
+    Rel. Slowdown  : 1.0000x
+    Overhead       : 0.0000 %
+
+  [RSA-2048] Sign
+    Iterations     : 100
+    Mean           : 757.3417 us
+    Median         : 797.0540 us
+    Minimum        : 602.2640 us
+    Maximum        : 1353.4800 us
+    Std Dev        : 144.5298 us
+    95% CI         : ±28.3278 us
+    Ops/sec        : 1320.41
+    Rel. Slowdown  : 1.0000x
+    Overhead       : 0.0000 %
+
+  [RSA-2048] Verify
+    Iterations     : 100
+    Mean           : 19.7297 us
+    Median         : 19.5070 us
+    Minimum        : 19.4460 us
+    Maximum        : 37.5110 us
+    Std Dev        : 1.8354 us
+    95% CI         : ±0.3597 us
+    Ops/sec        : 50685.06
+    Rel. Slowdown  : 1.0000x
+    Overhead       : 0.0000 %
+
+  [ML-DSA-65] Key Generation
+    Iterations     : 100
+    Mean           : 194.0767 us
+    Median         : 183.4435 us
+    Minimum        : 182.1060 us
+    Maximum        : 358.0800 us
+    Std Dev        : 29.8735 us
+    95% CI         : ±5.8552 us
+    Ops/sec        : 5152.60
+    Rel. Slowdown  : 0.0036x
+    Overhead       : -99.6380 %
+
+  [ML-DSA-65] Sign
+    Iterations     : 100
+    Mean           : 1069.3698 us
+    Median         : 831.5590 us
+    Minimum        : 347.2890 us
+    Maximum        : 4755.3420 us
+    Std Dev        : 778.6130 us
+    95% CI         : ±152.6081 us
+    Ops/sec        : 935.13
+    Rel. Slowdown  : 1.4120x
+    Overhead       : 41.2004 %
+
+  [ML-DSA-65] Verify
+    Iterations     : 100
+    Mean           : 209.8946 us
+    Median         : 184.5355 us
+    Minimum        : 183.5380 us
+    Maximum        : 767.0910 us
+    Std Dev        : 70.1457 us
+    95% CI         : ±13.7486 us
+    Ops/sec        : 4764.30
+    Rel. Slowdown  : 10.6385x
+    Overhead       : 963.8519 %
+
+========================================
+ End of Log
+========================================

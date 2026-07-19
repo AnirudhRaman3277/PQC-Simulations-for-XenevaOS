@@ -1,0 +1,68 @@
+{
+  "experiment": "Experiment 3: Secure Boot Simulation — Trusted Boot / Kernel Integrity",
+  "system": {
+    "compiler": "GNU",
+    "compiler_version": "g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+    "optimization_flags": " -march=native -fomit-frame-pointer ",
+    "openssl": "OpenSSL 3.5.5 27 Jan 2026",
+    "cpu_vendor": "AuthenticAMD",
+    "cpu_model": "AMD Ryzen 7 5800H with Radeon Graphics",
+    "cpu_arch": "x86_64",
+    "logical_cores": "16",
+    "physical_cores": "8",
+    "os_name": "Linux",
+    "kernel": "6.18.33.2-microsoft-standard-WSL2",
+    "ram": "7.4Gi",
+    "timestamp": "2026-07-19 09:20:43 UTC"
+  },
+  "boot_simulation": {
+    "kernel_size_bytes": 4194304,
+    "kernel_size_mb": 4.0,
+    "rsa_sign_time_us": 3895.3180,
+    "mldsa_sign_time_us": 17778.9060
+  },
+  "results": [
+    {
+      "algorithm": "RSA-2048",
+      "compiler": "GNU",
+      "compiler_version": "g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+      "optimization_flags": " -march=native -fomit-frame-pointer ",
+      "cpu_model": "AMD Ryzen 7 5800H with Radeon Graphics",
+      "operating_system": "Linux",
+      "timestamp": "2026-07-19 09:20:43 UTC",
+      "operation": "Boot Verification",
+      "iterations": 1000,
+      "average": 2593.2629,
+      "median": 2525.8565,
+      "minimum": 2484.0080,
+      "maximum": 4055.6630,
+      "variance": 35158.3409,
+      "standard_deviation": 187.5056,
+      "ci95_us": 11.6217,
+      "ops_per_sec": 385.61,
+      "relative_slowdown": 1.0000,
+      "overhead_pct": 0.0000
+    },
+    {
+      "algorithm": "ML-DSA-65",
+      "compiler": "GNU",
+      "compiler_version": "g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+      "optimization_flags": " -march=native -fomit-frame-pointer ",
+      "cpu_model": "AMD Ryzen 7 5800H with Radeon Graphics",
+      "operating_system": "Linux",
+      "timestamp": "2026-07-19 09:20:43 UTC",
+      "operation": "Boot Verification",
+      "iterations": 1000,
+      "average": 9883.7397,
+      "median": 9635.0980,
+      "minimum": 9192.0890,
+      "maximum": 17401.9130,
+      "variance": 819118.6056,
+      "standard_deviation": 905.0517,
+      "ci95_us": 56.0957,
+      "ops_per_sec": 101.18,
+      "relative_slowdown": 3.8113,
+      "overhead_pct": 281.1314
+    }
+  ]
+}

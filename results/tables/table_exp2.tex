@@ -1,0 +1,16 @@
+\begin{table}
+\caption{Experiment 2: RSA vs ML-DSA Performance}
+\label{tab:exp2}
+\begin{tabular}{lccccc}
+\toprule
+Algorithm & Operation & Mean Latency ($\mu$s) & Std Dev ($\mu$s) & Ops/sec & Slowdown (x) \\
+\midrule
+RSA-2048 & Key Generation & 53605.37 & 36766.06 & 18.65 & 1.00 \\
+RSA-2048 & Sign & 757.34 & 144.53 & 1320.41 & 1.00 \\
+RSA-2048 & Verify & 19.73 & 1.84 & 50685.06 & 1.00 \\
+ML-DSA-65 & Key Generation & 194.08 & 29.87 & 5152.60 & 0.00 \\
+ML-DSA-65 & Sign & 1069.37 & 778.61 & 935.13 & 1.41 \\
+ML-DSA-65 & Verify & 209.89 & 70.15 & 4764.30 & 10.64 \\
+\bottomrule
+\end{tabular}
+\end{table}

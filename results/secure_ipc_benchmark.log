@@ -1,0 +1,48 @@
+========================================
+ Benchmark Log
+ Experiment 5: Secure IPC Simulation (ECDH+AES vs ML-KEM+AES)
+========================================
+
+System Information
+  Compiler     : GNU g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0
+  Opt. Flags   :  -march=native -fomit-frame-pointer 
+  OpenSSL      : OpenSSL 3.5.5 27 Jan 2026
+  CPU          : AuthenticAMD AMD Ryzen 7 5800H with Radeon Graphics
+  CPU Arch     : x86_64
+  Cores        : 8 Physical / 16 Logical
+  OS & Kernel  : Linux 6.18.33.2-microsoft-standard-WSL2
+  RAM          : 7.4Gi
+  Time         : 2026-07-19 09:22:02 UTC
+  Duration     : 1.71 seconds
+
+----------------------------------------
+ Results
+----------------------------------------
+
+  [Classical (ECDH+AES)] IPC Roundtrip
+    Iterations     : 5000
+    Average        : 177.2730 us
+    Median         : 153.0760 us
+    Minimum        : 146.8090 us
+    Maximum        : 3325.7420 us
+    Std Dev        : 78.7111 us
+    95% CI         : ±2.1818 us
+    Ops/sec        : 5641.02
+    Rel. Slowdown  : 1.0000x
+    Overhead       : 0.0000 %
+
+  [PQ (ML-KEM+AES)] IPC Roundtrip
+    Iterations     : 5000
+    Average        : 154.0346 us
+    Median         : 137.3110 us
+    Minimum        : 136.0480 us
+    Maximum        : 4331.2170 us
+    Std Dev        : 98.2517 us
+    95% CI         : ±2.7234 us
+    Ops/sec        : 6492.05
+    Rel. Slowdown  : 0.8689x
+    Overhead       : -13.1088 %
+
+========================================
+ End of Log
+========================================

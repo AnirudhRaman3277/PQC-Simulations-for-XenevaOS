@@ -1,0 +1,3 @@
+Algorithm,Compiler,CompilerVersion,OptimizationFlags,CPUModel,OS,Timestamp,Operation,Iterations,Average(us),Median(us),Minimum(us),Maximum(us),StdDev(us),CI95(us),OpsPerSecond,RelativeSlowdown,OverheadPct
+RSA-2048,GNU,"g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0"," -march=native -fomit-frame-pointer ","AMD Ryzen 7 5800H with Radeon Graphics",Linux,2026-07-19 09:20:43 UTC,Boot Verification,1000,2593.2629,2525.8565,2484.0080,4055.6630,187.5056,11.6217,385.61,1.0000,0.0000
+ML-DSA-65,GNU,"g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0"," -march=native -fomit-frame-pointer ","AMD Ryzen 7 5800H with Radeon Graphics",Linux,2026-07-19 09:20:43 UTC,Boot Verification,1000,9883.7397,9635.0980,9192.0890,17401.9130,905.0517,56.0957,101.18,3.8113,281.1314

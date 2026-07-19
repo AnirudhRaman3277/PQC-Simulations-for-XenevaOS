@@ -1,0 +1,3 @@
+Algorithm,Compiler,CompilerVersion,OptimizationFlags,CPUModel,OS,Timestamp,Operation,Iterations,Average(us),Median(us),Minimum(us),Maximum(us),StdDev(us),CI95(us),OpsPerSecond,RelativeSlowdown,OverheadPct
+Classical (ECDH+AES),GNU,"g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0"," -march=native -fomit-frame-pointer ","AMD Ryzen 7 5800H with Radeon Graphics",Linux,2026-07-19 09:22:02 UTC,IPC Roundtrip,5000,177.2730,153.0760,146.8090,3325.7420,78.7111,2.1818,5641.02,1.0000,0.0000
+PQ (ML-KEM+AES),GNU,"g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0"," -march=native -fomit-frame-pointer ","AMD Ryzen 7 5800H with Radeon Graphics",Linux,2026-07-19 09:22:02 UTC,IPC Roundtrip,5000,154.0346,137.3110,136.0480,4331.2170,98.2517,2.7234,6492.05,0.8689,-13.1088

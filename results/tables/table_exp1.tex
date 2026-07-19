@@ -1,0 +1,17 @@
+\begin{table}
+\caption{Experiment 1: ECDH vs ML-KEM Performance}
+\label{tab:exp1}
+\begin{tabular}{lccccc}
+\toprule
+Algorithm & Operation & Mean Latency ($\mu$s) & Std Dev ($\mu$s) & Ops/sec & Slowdown (x) \\
+\midrule
+ECDH-P256 & Key Generation & 25.83 & 10.98 & 38720.50 & 1.00 \\
+ECDH-P256 & Shared Secret & 80.96 & 40.11 & 12352.17 & 1.00 \\
+ECDH-P256 & Full Key Exchange & 138.68 & 50.31 & 7210.91 & 1.00 \\
+ML-KEM-768 & Key Generation & 70.55 & 19.75 & 14173.89 & 2.73 \\
+ML-KEM-768 & Encapsulation & 49.99 & 25.12 & 20003.87 & 1.00 \\
+ML-KEM-768 & Decapsulation & 73.83 & 47.14 & 13545.16 & 1.00 \\
+ML-KEM-768 & Full Key Exchange & 202.77 & 90.66 & 4931.71 & 1.46 \\
+\bottomrule
+\end{tabular}
+\end{table}

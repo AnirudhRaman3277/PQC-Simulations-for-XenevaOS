@@ -1,0 +1,16 @@
+\begin{table}
+\caption{Experiment 4: Package Verification (Software Supply Chain)}
+\label{tab:exp4}
+\begin{tabular}{lccccc}
+\toprule
+Algorithm & Operation & Mean Latency ($\mu$s) & Std Dev ($\mu$s) & Ops/sec & Slowdown (x) \\
+\midrule
+RSA-2048 & Verify 100 Packages & 66444.57 & 1340.51 & 15.05 & 1.00 \\
+ML-DSA-65 & Verify 100 Packages & 269048.09 & 5582.31 & 3.72 & 4.05 \\
+RSA-2048 & Verify 500 Packages & 333772.87 & 2178.25 & 3.00 & 1.00 \\
+ML-DSA-65 & Verify 500 Packages & 1357699.09 & 39507.71 & 0.74 & 4.07 \\
+RSA-2048 & Verify 1000 Packages & 663680.03 & 5607.33 & 1.51 & 1.00 \\
+ML-DSA-65 & Verify 1000 Packages & 2708943.80 & 67405.14 & 0.37 & 4.08 \\
+\bottomrule
+\end{tabular}
+\end{table}

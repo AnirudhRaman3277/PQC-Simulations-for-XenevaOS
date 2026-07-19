@@ -1,0 +1,60 @@
+========================================
+ Benchmark Log
+ Experiment 3: Secure Boot Simulation — Trusted Boot / Kernel Integrity
+========================================
+
+System Information
+  Compiler : g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0
+  OpenSSL  : OpenSSL 3.5.5 27 Jan 2026
+  CPU      : AMD Ryzen 7 5800H with Radeon Graphics
+  Kernel   : 6.18.33.2-microsoft-standard-WSL2
+  RAM      : 7.4Gi
+  Time     : 2026-07-19 09:20:43 UTC
+  Duration : 13.80 seconds
+
+----------------------------------------
+ Simulation Parameters
+----------------------------------------
+
+  Kernel image size : 4 MB (4194304 bytes)
+  Warmup            : 100 verifications
+  Measured          : 1000 verifications
+
+----------------------------------------
+ Signing (Build-Time Cost)
+----------------------------------------
+
+  RSA-2048    : 3895.3180 us (3.90 ms)
+  ML-DSA-65   : 17778.9060 us (17.78 ms)
+
+----------------------------------------
+ Verification Results (Boot-Time Cost)
+----------------------------------------
+
+  [RSA-2048] Boot Verification
+    Iterations     : 1000
+    Mean           : 2593.2629 us
+    Median         : 2525.8565 us
+    Minimum        : 2484.0080 us
+    Maximum        : 4055.6630 us
+    Std Dev        : 187.5056 us
+    95% CI         : ±11.6217 us
+    Ops/sec        : 385.61
+    Rel. Slowdown  : 1.0000x
+    Overhead       : 0.0000 %
+
+  [ML-DSA-65] Boot Verification
+    Iterations     : 1000
+    Mean           : 9883.7397 us
+    Median         : 9635.0980 us
+    Minimum        : 9192.0890 us
+    Maximum        : 17401.9130 us
+    Std Dev        : 905.0517 us
+    95% CI         : ±56.0957 us
+    Ops/sec        : 101.18
+    Rel. Slowdown  : 3.8113x
+    Overhead       : 281.1314 %
+
+========================================
+ End of Log
+========================================
