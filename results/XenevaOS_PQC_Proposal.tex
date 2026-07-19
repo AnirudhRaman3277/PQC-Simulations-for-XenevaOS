@@ -1,4 +1,4 @@
-\documentclass[10pt, a4paper]{article}
+\documentclass[11pt, a4paper]{article}
 
 \usepackage[utf8]{inputenc}
 \usepackage{geometry}
@@ -6,6 +6,11 @@
 \usepackage[table]{xcolor}
 \usepackage{enumitem}
 \usepackage{makecell}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{tabularx}
+\usepackage{setspace}
+\usepackage{titling}
 
 \definecolor{tblheader}{gray}{0.85}
 \definecolor{tblrow1}{gray}{0.95}
@@ -14,40 +19,47 @@
 \newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
 \newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
 
-\usepackage{graphicx}
-\usepackage{hyperref}
-\usepackage{tabularx}
-\usepackage{setspace}
-
 \geometry{margin=0.75in}
 \setstretch{1.15}
 
-% Set the section counter so this appears as Section 10 to match the overarching XenevaOS Security Architecture document
-\setcounter{section}{8}
+\title{\Large\textbf{Cryptographic Primitives with Post Quantum Support}\\[0.5em]
+\large XenevaOS: A Post-Quantum Ready XR Native Operating System}
+\author{Devansh Mehrotra \and Ganapathy Raman Anirudh}
+\date{\today}
+
 
 \begin{document}
 
-\setcounter{section}{6}
+\maketitle
 
-%% ====================================================================
-%% XenevaOS PQC White Paper -- Expansion Sections
-%%
-%% INSTRUCTIONS FOR INTEGRATION:
-%%   Insert this content into XenevaOS_PQC_Proposal.tex as follows:
-%%   - Sections 7--8 go BEFORE the existing Cryptographic Architecture
-%%     (Section 9).
-%%   - Sections 11--23 go AFTER the existing PQC Benchmarks (Section 10)
-%%     and its Strategic Implementation Recommendations subsection.
-%%   Adjust setcounter as needed.
-%%
-%%   The content below compiles directly inside the existing preamble.
-%% ====================================================================
+\begin{abstract}
+The advent of cryptographically relevant quantum computers poses an existential threat to the classical public-key cryptography that underpins modern operating systems. This white paper presents the post-quantum cryptographic architecture for XenevaOS, an XR-native operating system designed for long-term deployment in government, defence, healthcare, and industrial environments. We conduct a comprehensive empirical evaluation of NIST-standardised post-quantum primitives---ML-KEM-768 (FIPS 203) for key encapsulation and ML-DSA-65 (FIPS 204) for digital signatures---benchmarked natively in C++ against their classical counterparts (ECDH P-256 and RSA-2048). Our results demonstrate that ML-KEM-768 outperforms classical ECDH in secure IPC pipelines by 7.2\%, while ML-DSA-65 introduces an acceptable 6.06~ms overhead for secure boot verification of a 4~MB kernel image. We present a complete kernel-level integration strategy covering hybrid TLS 1.3, capability-mediated IPC, storage encryption with post-quantum key wrapping, and a four-phase, 24-month migration roadmap aligned with NSA CNSA 2.0 and ETSI TR 103 619 guidelines.
+\end{abstract}
+
+\newpage
+\tableofcontents
+\newpage
+
+\section{Introduction}\label{sec:introduction}
+
+The security architecture of any operating system is fundamentally anchored in the computational intractability of a small number of mathematical problems. The RSA cryptosystem relies on the difficulty of integer factorisation; elliptic curve schemes rely on the discrete logarithm problem over finite fields. A sufficiently powerful quantum computer, executing Shor's algorithm, renders both classes of problems tractable in polynomial time.
+
+This paper addresses the systematic integration of post-quantum cryptographic primitives into XenevaOS, an XR-native operating system under development at C-DAC. The work is motivated by three converging factors: (1) the accelerating progress toward cryptographically relevant quantum computers, (2) the long deployment lifecycle of operating systems in government and defence contexts (15--20 years), and (3) the unique security requirements of Extended Reality platforms, which bind persistent digital identity to physical space and generate sensitive biometric and spatial data requiring long-term confidentiality.
+
+The contributions of this paper are as follows:
+
+\begin{enumerate}
+    \item A comprehensive native C++ benchmark suite evaluating the performance of NIST-standardised post-quantum algorithms (ML-KEM-768, ML-DSA-65) against classical baselines (ECDH P-256, RSA-2048) across five operating-system-relevant workloads.
+    \item A kernel-level integration architecture for post-quantum cryptography, covering the crypto framework, process manager, driver framework, network stack, IPC, and filesystem.
+    \item A hybrid TLS 1.3 design combining X25519 and ML-KEM-768 with dual-signed certificate validation.
+    \item A detailed engineering risk assessment and a four-phase, 24-month migration roadmap aligned with NIST, ETSI, and NSA CNSA 2.0 standards.
+\end{enumerate}
+
+The remainder of this paper is organised as follows. Section~2 analyses the quantum threat landscape. Section~3 examines the specific post-quantum security requirements of XR platforms. Section~4 presents the cryptographic architecture and gap analysis. Section~5 details the empirical benchmark methodology and results. Sections~6--12 describe the standards landscape, migration strategy, kernel integration, secure boot chain, hybrid TLS, secure IPC, and storage security architectures. Sections~13--16 cover risk assessment, extended performance analysis, regulatory compliance, and the phased migration roadmap.
 
 
-%% ====================================================================
-%%  PRE-CONTEXT SECTIONS (Insert BEFORE Section 9)
-%%  Set counter to 6 so these become Sections 7 and 8
-%% ====================================================================
+
+
 
 
 
@@ -139,8 +151,6 @@ Digital twin deployments in industrial XR overlay real-time sensor data onto phy
 %%  Set counter to 10 so these become Sections 11 onward
 %% ====================================================================
 
-%% Restore counter for existing Section 9
-\setcounter{section}{8}
 
 \section{Cryptographic Architecture}\label{cryptographic-architecture}
 
@@ -433,7 +443,6 @@ Based on the empirical data gathered during these exhaustive simulations, we pro
     \item \textbf{Implement Signature Caching for Daemons:} Due to the higher verification latency of ML-DSA, subsystems that require high-frequency authentication (like package managers and daemon execution control) must implement aggressive signature caching mechanisms (e.g., verifying once and trusting the inode/memory-mapping) to prevent system-wide performance degradation.
 \end{enumerate}
 
-\setcounter{section}{10}
 %% ====================================================================
 %%  SECTION 11: GLOBAL STANDARDS LANDSCAPE
 %% ====================================================================
@@ -888,43 +897,6 @@ The integration of post-quantum cryptography into an operating system kernel, pa
 \item[Crypto-Agile Operating System Framework with Automated Fallback.] The framework's ability to detect algorithm compromise (through policy updates or external signals) and automatically switch all consumers to a fallback algorithm (e.g., from ML-DSA to SLH-DSA) without system restart constitutes a novel resilience mechanism.
 \end{description}
 %% ====================================================================
-%%  SECTION 22: RESEARCH DELIVERABLES
-%% ====================================================================
-
-\section{Research Deliverables}\label{sec:deliverables}
-
-This research programme produces eight formal deliverables, each with defined scope, technical depth, and acceptance criteria.
-
-\begin{description}[leftmargin=0pt,style=unboxed]
-
-\item[Deliverable 1: White Paper (80--120 pages).]
-A comprehensive technical white paper documenting the XenevaOS post-quantum security architecture. The document covers threat analysis, standards alignment, architectural design, empirical benchmarking, migration strategy, risk assessment, and compliance mapping. This document, in its final form, constitutes Deliverable~1.
-
-\item[Deliverable 2: Kernel Crypto Framework.]
-A working implementation of the Kernel Crypto Framework with support for ML-KEM-768, ML-DSA-65, SLH-DSA (fallback), AES-256-GCM, SHA-3-256, and HKDF-SHA-256. The framework exposes the operation-based API described in Section~13.1 and includes the hybrid combiner for ML-KEM + X25519.
-
-\item[Deliverable 3: Hybrid TLS Prototype.]
-A functional prototype of the hybrid TLS 1.3 implementation described in Section~15. The prototype demonstrates hybrid key exchange (X25519 + ML-KEM-768), dual-signed certificate validation (ECDSA + ML-DSA-65), and session resumption with quantum-resistant ticket encryption.
-
-\item[Deliverable 4: PQC Secure Boot Prototype.]
-A prototype secure boot chain implementing the architecture described in Section~14. The prototype demonstrates LMS firmware verification, ML-DSA-65 kernel verification, measured boot with PCR extension, and rollback protection.
-
-\item[Deliverable 5: Secure IPC Prototype.]
-A prototype of the capability-mediated, ML-KEM-secured IPC architecture described in Section~16. The prototype demonstrates in-kernel key encapsulation, AES-256-GCM message encryption, replay protection, and capability-based access control.
-
-\item[Deliverable 6: Benchmark Suite.]
-The complete C++ benchmark suite used to generate the results in Section~10, including all five experiments, the statistical analysis pipeline, and the automated report generation system. The suite is reproducible and platform-portable.
-
-\item[Deliverable 7: Technology Roadmap.]
-A detailed, phased technology roadmap with dependency tracking, risk registers, and milestone definitions. The roadmap covers the full 24-month migration timeline described in Section~23.
-
-\item[Deliverable 8: Standards Compliance Report.]
-A formal compliance assessment mapping XenevaOS capabilities to FIPS 203, FIPS 204, FIPS 205, NIST SP 800-57, NIST SP 800-90A/B/C, NIST SP 800-193, NSA CNSA 2.0, and ETSI TR 103 619. The report identifies gaps and provides a remediation timeline.
-
-\end{description}
-
-
-%% ====================================================================
 %%  SECTION 23: PHASED MIGRATION ROADMAP
 %% ====================================================================
 
@@ -1021,5 +993,18 @@ The post-quantum migration of XenevaOS proceeds through four phases over a 24-mo
 \textbf{Risks.} FIPS validation timeline uncertainty; zero-day vulnerabilities discovered during penetration testing; NIST test vector changes during the validation period.
 
 \textbf{Success Criteria.} FIPS 140-3 module submission accepted. Zero critical vulnerabilities in penetration testing. Interoperability validated with at least five external TLS implementations and three certificate authorities. Side-channel analysis confirms constant-time behaviour on all target platforms.
+
+
+\section{Conclusion}\label{sec:conclusion}
+
+This paper has presented a comprehensive architecture for integrating NIST-standardised post-quantum cryptographic primitives into XenevaOS, an XR-native operating system designed for government, defence, and enterprise deployment. Through rigorous native C++ benchmarking, we have demonstrated that the transition to post-quantum cryptography is not only feasible but, in certain critical subsystems, advantageous.
+
+The empirical results establish three key findings. First, ML-KEM-768 key encapsulation outperforms classical ECDH P-256 in the secure IPC pipeline, delivering a 7.2\% latency reduction while providing quantum resistance. Second, ML-DSA-65 signature verification, though $9\times$ slower than RSA-2048 at the primitive level, introduces an absolute overhead of only 6.06~ms for secure boot verification of a 4~MB kernel image---a cost that is entirely imperceptible to the end user and well within the boot-time performance budget. Third, the package verification subsystem maintains acceptable throughput at 455 packages per second under ML-DSA-65, confirming that background system updates remain unimpacted.
+
+The architectural contributions of this work---the operation-based Kernel Crypto Framework, the capability-mediated secure IPC with in-kernel key encapsulation, the hybrid TLS 1.3 design with dual-signed certificates, and the layered storage encryption with post-quantum key wrapping---collectively demonstrate that post-quantum readiness can be designed into an operating system from the ground up, rather than retrofitted as an afterthought.
+
+The four-phase, 24-month migration roadmap provides a concrete, standards-aligned pathway from classical cryptography through hybrid deployment to full post-quantum operation. Alignment with NSA CNSA 2.0 timelines, ETSI TR 103 619 maturity levels, and NIST FIPS 203/204/205 certification requirements ensures that XenevaOS will be deployable in regulated environments upon completion of the migration programme.
+
+The quantum threat to classical cryptography is not speculative; it is a matter of timeline uncertainty. The Harvest Now, Decrypt Later attack model makes this threat immediate for any system handling data with long-term confidentiality requirements. For an XR-native operating system that captures spatial maps, biometric identifiers, and behavioural telemetry, post-quantum readiness is not a future aspiration---it is a present-day engineering obligation. This paper demonstrates that XenevaOS is architecturally prepared to meet it.
 
 \end{document}
