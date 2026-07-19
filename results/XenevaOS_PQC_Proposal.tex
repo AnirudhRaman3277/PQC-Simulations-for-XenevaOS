@@ -3,7 +3,17 @@
 \usepackage[utf8]{inputenc}
 \usepackage{geometry}
 \usepackage{booktabs}
-\usepackage{xcolor}
+\usepackage[table]{xcolor}
+\usepackage{enumitem}
+\usepackage{makecell}
+
+\definecolor{tblheader}{gray}{0.85}
+\definecolor{tblrow1}{gray}{0.95}
+\definecolor{tblrow2}{gray}{1.0}
+
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+
 \usepackage{graphicx}
 \usepackage{hyperref}
 \usepackage{tabularx}
@@ -13,9 +23,195 @@
 \setstretch{1.15}
 
 % Set the section counter so this appears as Section 10 to match the overarching XenevaOS Security Architecture document
-\setcounter{section}{9}
+\setcounter{section}{8}
 
 \begin{document}
+
+\section{Cryptographic Architecture}\label{cryptographic-architecture}
+
+\subsection{Current Implementation (Gap Analysis)}\label{current-implementation-gap-analysis}
+
+This section states the cryptographic ground truth of the evidence commit without decoration, because the dependent claims elsewhere in this document are only as credible as this analysis.
+
+\begin{table}[!ht]
+\centering
+\caption{Cryptographic Capability Gap Analysis}\label{tab:crypto-gaps}
+\small
+\begin{tabularx}{\textwidth}{%
+  X L{3.5cm} C{1.5cm} C{1.8cm} L{3.5cm}}
+\toprule
+\rowcolor{tblheader}
+\thead{Capability} & \thead{Required Primitives} & \thead{Present} & \thead{Phase} & \thead{Dependent Features} \\
+\midrule
+\rowcolor{tblrow1}
+Module signing & SHA-256/SHA-3 + RSA/Ed25519 & Planned & Phase 1 & Kernel module trust chain (Sec 8.1) \\
+\rowcolor{tblrow2}
+Application signing & SHA-256 + RSA/Ed25519 & Planned & Phase 1 & App registry, sandbox profiles \\
+\rowcolor{tblrow1}
+Measured boot & SHA-256/SHA-3 & Planned & Phase 1 & TPM PCR extension (Sec 7.7) \\
+\rowcolor{tblrow2}
+CSPRNG & ChaCha20/AES-CTR + entropy pool & Planned & Phase 1 & ASLR, token generation, nonces \\
+\rowcolor{tblrow1}
+Disk encryption & AES-XTS + key derivation & Planned & Phase 2 & Data-at-rest protection \\
+\rowcolor{tblrow2}
+TLS stack & AES-GCM, ChaCha20, X25519, certificates & Planned & Phase 2 & Network confidentiality \\
+\rowcolor{tblrow1}
+Sealed storage & AES-GCM + TPM seal/unseal & Planned & Phase 2 & Key-at-rest protection (Sec 9.3) \\
+\rowcolor{tblrow2}
+PQC boot chain & ML-DSA + classical (hybrid) & Planned & Phase 3 & Quantum-safe boot (Sec 1.4) \\
+\rowcolor{tblrow1}
+PQC TLS & ML-KEM + X25519 (hybrid) & Planned & Phase 3 & Quantum-safe networking \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Present in the tree today:
+
+\begin{itemize}
+\item the vendored UEFI authentication interface definitions in the bootloader (image-authentication, certificate, and PKCS\#7 structures under Boot/include/), the format and protocol carriage for the boot-chain completion of Section 7.3,
+\item a non-cryptographic mixing generator in the credential subsystem (KernelAA64/Cred/cred.c), seeded from the architectural counter and used for internal ID allocation. It is expressly not a CSPRNG and is not represented as one anywhere in this submission.
+\end{itemize}
+
+Not present in the tree at the evidence commit:
+
+\begin{itemize}
+\item any cryptographic primitive library (hash, cipher, signature),
+\item any CSPRNG or entropy-pool infrastructure,
+\item key management services, TLS, disk encryption, TPM support.
+\end{itemize}
+
+Every capability in this document that consumes cryptography, module and application signing, measured boot, sealed storage, encrypted volumes, secure update validation, quantum-safe networking, carries this dependency and is scheduled behind it.
+
+The gap is stated this bluntly for a reason. It is the single most important sequencing fact in the security roadmap, it is verifiable by any evaluator with repository access, and the remainder of this section shows that the surrounding architecture has been shaped so that closing this one gap activates prepared interfaces across the entire system.
+
+\subsection{Architecture Roadmap: Cryptographic Services Layer}\label{architecture-roadmap-crypto-services}
+
+The layer is structured as a layered facility serving kernel and middleware consumers through one API family.
+
+\begin{description}[leftmargin=0pt,style=unboxed]
+\item[Kernel primitive core.] The baseline algorithms: SHA-2/SHA-3 family hashing, AES-based authenticated encryption, signature verification for the boot and module chains. Small enough for exhaustive review, usable from the earliest loader stages.
+\item[Kernel CSPRNG.] Fed from an entropy framework aggregating hardware sources, architectural randomness instructions where present, timing and interrupt jitter, TPM entropy once integrated, into a continuously reseeded pool.
+\item[Middleware cryptographic services API.] Daemons and applications obtain hashing, encryption, signing, and TLS without touching primitives directly.
+\end{description}
+
+\subsubsection{Algorithm Agility: Classical to PQC Transition}
+
+Algorithm agility is a first-class property, per the PQC schedule. Consumers bind to operations, not algorithms. Crucially, this agility layer is engineered to support the NIST PQC final standards (FIPS 203 ML-KEM/Kyber for Key Encapsulation and FIPS 204 ML-DSA/Dilithium for Digital Signatures). The architecture aligns with the ETSI TR 103 619 guidelines for seamless migration, allowing the OS to dynamically negotiate hybrid classical-quantum handshake protocols during the transition decade.
+
+\begin{table}[!ht]
+\centering
+\caption{Algorithm Agility: Classical $\rightarrow$ PQC Transition Map}\label{tab:pqc-transition}
+\small
+\begin{tabularx}{\textwidth}{%
+  X L{2.8cm} L{2.8cm} L{2.0cm} L{2.8cm}}
+\toprule
+\rowcolor{tblheader}
+\thead{Operation} & \thead{Classical Algo.} & \thead{PQC Successor} & \thead{Hybrid Mode} & \thead{Standards Ref.} \\
+\midrule
+\rowcolor{tblrow1}
+Digital signature & RSA-2048 / Ed25519 & ML-DSA (Dilithium) & Both must verify & FIPS 204 \\
+\rowcolor{tblrow2}
+Key encapsulation & ECDH (X25519) & ML-KEM (Kyber) & Both must decapsulate & FIPS 203 \\
+\rowcolor{tblrow1}
+Hashing & SHA-256 & SHA-3-256 & Single algorithm & FIPS 202 \\
+\rowcolor{tblrow2}
+Authenticated encryption & AES-256-GCM & AES-256-GCM & No PQC equivalent needed & NIST SP 800-38D \\
+\rowcolor{tblrow1}
+Key derivation & HKDF (RFC 5869) & HKDF (unchanged) & No PQC equivalent needed & RFC 5869 \\
+\rowcolor{tblrow2}
+Stateful hash signature & N/A & XMSS/LMS & Boot chain option & NIST SP 800-208 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Hybrid dual-algorithm modes, classical plus PQC with both required to pass, are the designed default for the boot chain and TLS key exchange.
+
+Delivery tracks the consumers: primitives and CSPRNG first (unblocking module signing and measured boot), key management and TLS next, PQC hybridization on the schedule fixed in the wider proposal.
+
+\subsection{Key Management and Secure Storage (Roadmap)}\label{key-management-secure-storage}
+
+Key management is designed as a kernel-anchored hierarchy with hardware binding where the platform provides it.
+
+\begin{table}[!ht]
+\centering
+\caption{Key Hierarchy Architecture}\label{tab:key-hierarchy}
+\small
+\begin{tabularx}{\textwidth}{%
+  X L{2.2cm} L{2.5cm} L{2.5cm} L{3.5cm}}
+\toprule
+\rowcolor{tblheader}
+\thead{Key Type} & \thead{Storage} & \thead{Protection} & \thead{Rotation Policy} & \thead{Dependent Services} \\
+\midrule
+\rowcolor{tblrow1}
+Platform root key & TPM fuses / SW sealed & Immutable; never exported & Lifetime of device & All trust decisions \\
+\rowcolor{tblrow2}
+Signing root cert & Kernel cert store & Boot-chain verified delivery & Signed atomic update & Module + app signing \\
+\rowcolor{tblrow1}
+Disk encryption key & TPM-sealed / SW-sealed & Released on measured-good boot & Per-volume; admin-triggered & FDE / file encryption \\
+\rowcolor{tblrow2}
+Attestation key & TPM-resident & Never leaves TPM & Per-enrollment & Device attestation \\
+\rowcolor{tblrow1}
+Service identity key & Kernel key store & Process-scoped; handle-only & Per-service-lifecycle & Daemon authentication \\
+\rowcolor{tblrow2}
+User session key & Middleware key svc & Derived from credentials & Per-login session & User data encryption \\
+\rowcolor{tblrow1}
+Ephemeral TLS key & In-memory only & Zeroized after session & Per-connection & TLS forward secrecy \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{itemize}
+\item \textbf{Kernel key store.} Holds the certificate material admission decisions consult, the module and application signing roots of Sections 8.1 and 8.3. Provisioned through the verified boot chain, updated only through signed atomic updates, so trust-anchor changes are themselves chain-validated.
+\item \textbf{Per-purpose key derivation} beneath device root keys. Disk encryption, attestation, and service identities are cryptographically separated and individually rotatable.
+\item \textbf{TPM sealing} for at-rest protection of root material, binding key release to measured-good platform state per Sections 7.6 and 7.7, with software-sealed storage as the fallback on TPM-less targets.
+\item \textbf{Middleware key-service API.} Applications reference keys by handle and never receive raw private material. This is the key-usage analogue of the descriptor-based capability model, shaped deliberately to slot into the caps[]/fds[] discipline of Section 2.3.
+\item \textbf{HSM integration} for server and infrastructure deployments, under the same handle-based contract.
+\end{itemize}
+
+\subsection{Trust Framework: Signed Distribution and Runtime Integrity Verification}\label{trust-framework}
+
+The trust framework is the system-wide consumption of the preceding machinery, closing the loop this document opened with the boot chain.
+
+\begin{description}[leftmargin=0pt,style=unboxed]
+\item[Signed distribution.] Every artefact that executes, kernel, modules, daemons, applications, shared libraries, is signed under the authority hierarchy of Section 9.3 and verified at its admission point: the boot chain for kernel and boot modules, the driver framework for runtime modules, the application loader and registry for user software. Distribution flows through the cryptographically gated registry of the ecosystem schedule, so supply-chain integrity is enforced at the same chokepoints as runtime integrity.
+\item[Verified atomic updates.] The update mechanism commits an update only when every component in the unified block passes signature validation and initializes. Bootloader-driven rollback restores the last verified state on any failure, making update time the strongest moment in the trust lifecycle rather than the weakest.
+\item[Runtime integrity verification.] Re-validation of signatures at process spawn from the registry's records. Measured-boot attestation of the running configuration for enterprise and mobile deployment, the device-attestation direction of the mobile schedule. As the audit framework matures, continuous verification that the token-registered daemon set matches the attested configuration.
+\end{description}
+
+Each element lands on an enforcement point that already exists in the architecture. That correspondence, prepared chokepoints on one side and scheduled cryptography on the other, is the central claim of this document, and it is a claim an evaluator can verify line by line in the cited sources.
+
+\subsection{Standards Compliance: Cryptographic Architecture}\label{crypto-standards-compliance}
+
+\begin{table}[!ht]
+\centering
+\caption{Cryptographic Standards Compliance Matrix}\label{tab:crypto-standards}
+\small
+\begin{tabularx}{\textwidth}{%
+  X L{4.5cm} L{3.5cm} C{2.0cm}}
+\toprule
+\rowcolor{tblheader}
+\thead{Standard} & \thead{Requirement} & \thead{XenevaOS Mapping} \\
+\midrule
+\rowcolor{tblrow1}
+FIPS 140-3 & Validated cryptographic module boundary & Kernel primitive core + CSPRNG \\
+\rowcolor{tblrow2}
+FIPS 203 (ML-KEM) & PQC key encapsulation & Hybrid TLS key exchange \\
+\rowcolor{tblrow1}
+FIPS 204 (ML-DSA) & PQC digital signature & Boot chain + module signing \\
+\rowcolor{tblrow2}
+NIST SP 800-57 & Key management lifecycle & Key hierarchy (Table~\ref{tab:key-hierarchy}) \\
+\rowcolor{tblrow1}
+NIST SP 800-90A/B/C & Random number generation & Kernel CSPRNG design \\
+\rowcolor{tblrow2}
+NIST SP 800-193 & Platform firmware resiliency & UEFI Secure Boot + measured boot \\
+\rowcolor{tblrow1}
+RFC 8446 & TLS 1.3 & Middleware crypto services API \\
+\rowcolor{tblrow2}
+RFC 5869 & HKDF key derivation & Per-purpose key derivation \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
 
 \section{Post-Quantum Cryptography Benchmarks (Roadmap)}
 
